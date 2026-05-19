@@ -8,6 +8,10 @@ import { AdminBlogPage } from "./pages/AdminBlogPage.jsx";
 import { BlogIndexPage } from "./pages/BlogIndexPage.jsx";
 import { BlogPostPage } from "./pages/BlogPostPage.jsx";
 import promaThankYouImage from "./assets/Proma-Thank-you.png";
+import founderLifeImage from "./assets/founder-life-simplified-dark.svg";
+import travelerCoupleImage from "./assets/traveler-couple-dark.svg";
+import researcherPonytailImage from "./assets/researcher-ponytail-research.svg";
+import promaCoffeeImage from "./assets/proma-coffee-girl.svg";
 import {
   BookOpen,
   Camera,
@@ -192,6 +196,19 @@ const heroPages = [
     note: "— notebooks, models, and coffee",
     sketch: "research",
   },
+  {
+    page: "4",
+    label: "traveler story",
+    eyebrow: "Notes from the road",
+    name: "Traveler ✦",
+    title: "I collect cities, conversations, and quiet mornings.",
+    meta: ["✈ borders", "● slow travel", "✎ field notes"],
+    line: "every place teaches a different way to think ✧",
+    primary: "See the journey",
+    secondary: "Travel notes",
+    note: "— passport stamps & cafés along the way",
+    sketch: "travel",
+  },
 ];
 
 function SideRail({ right = false }) {
@@ -289,95 +306,52 @@ function RuledCard({ children, className = "" }) {
 
 function Page0() {
   return (
-    <svg viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg" className="h-auto w-full">
-      <rect x="60" y="30" width="240" height="170" rx="8" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <rect x="60" y="30" width="240" height="28" rx="8" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <circle cx="80" cy="44" r="5" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <circle cx="96" cy="44" r="5" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <circle cx="112" cy="44" r="5" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <rect x="122" y="37" width="100" height="14" rx="4" fill="none" stroke="var(--terracotta)" strokeWidth="1.2" />
-      <text x="172" y="48" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="7" fill="var(--terracotta)">student path</text>
-      <rect x="72" y="72" width="100" height="12" rx="3" fill="none" stroke="var(--terracotta)" strokeWidth="1.2" />
-      <rect x="72" y="92" width="70" height="8" rx="2" fill="none" stroke="var(--terracotta)" strokeWidth="1" />
-      <rect x="72" y="108" width="85" height="8" rx="2" fill="none" stroke="var(--terracotta)" strokeWidth="1" />
-      <rect x="72" y="124" width="60" height="8" rx="2" fill="none" stroke="var(--terracotta)" strokeWidth="1" />
-      <ellipse cx="210" cy="115" rx="28" ry="22" fill="none" stroke="var(--terracotta)" strokeWidth="1.8" />
-      <circle cx="210" cy="115" r="10" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <circle cx="206" cy="111" r="2" fill="var(--terracotta)" />
-      <path d="M220 108 Q228 103 232 108 Q228 114 220 112" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <circle cx="320" cy="200" r="22" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <path d="M300 192 Q310 178 320 178 Q330 178 340 192" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <circle cx="313" cy="198" r="2.5" fill="var(--terracotta)" />
-      <circle cx="327" cy="198" r="2.5" fill="var(--terracotta)" />
-      <path d="M314 207 Q320 213 326 207" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <path d="M310 222 L305 280 L335 280 L330 222" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <path d="M308 235 Q290 245 278 238" fill="none" stroke="var(--terracotta)" strokeWidth="1.8" />
-      <path d="M332 235 Q348 240 355 233" fill="none" stroke="var(--terracotta)" strokeWidth="1.8" />
-      <rect x="274" y="238" width="56" height="36" rx="4" fill="none" stroke="var(--terracotta)" strokeWidth="1.8" />
-      <path d="M268 274 L336 274" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <path d="M30 300 Q20 270 35 255 Q42 265 30 300" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <path d="M40 295 Q25 265 45 245 Q55 258 40 295" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <path d="M20 310 L65 310" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <circle cx="22" cy="255" r="6" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <circle cx="22" cy="255" r="2.5" fill="var(--terracotta)" />
-      <text x="150" y="25" fontFamily="serif" fontSize="14" fill="var(--terracotta)" opacity="0.7">✦</text>
-      <text x="350" y="50" fontFamily="serif" fontSize="12" fill="var(--terracotta)" opacity="0.6">✦</text>
-    </svg>
+    <img
+      src={promaCoffeeImage}
+      alt="Proma — a hand-drawn portrait with a coffee cup"
+      className="h-auto w-full select-none"
+      draggable={false}
+    />
   );
 }
 
 function Page1() {
   return (
-    <svg viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg" className="h-auto w-full">
-      <circle cx="190" cy="100" r="40" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <text x="190" y="95" textAnchor="middle" fontFamily="Caveat, cursive" fontSize="14" fill="var(--terracotta)" fontWeight="600">clear</text>
-      <text x="190" y="112" textAnchor="middle" fontFamily="Caveat, cursive" fontSize="14" fill="var(--terracotta)" fontWeight="600">path</text>
-      <circle cx="80" cy="60" r="20" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <text x="80" y="64" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)">people</text>
-      <line x1="100" y1="70" x2="150" y2="90" stroke="var(--terracotta)" strokeWidth="1" strokeDasharray="4,3" />
-      <circle cx="300" cy="60" r="20" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <text x="300" y="64" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)">story</text>
-      <line x1="280" y1="70" x2="230" y2="90" stroke="var(--terracotta)" strokeWidth="1" strokeDasharray="4,3" />
-      <circle cx="80" cy="180" r="20" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <text x="80" y="184" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)">tools</text>
-      <line x1="100" y1="170" x2="155" y2="130" stroke="var(--terracotta)" strokeWidth="1" strokeDasharray="4,3" />
-      <circle cx="300" cy="180" r="20" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <text x="300" y="184" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)">plan</text>
-      <line x1="280" y1="170" x2="225" y2="130" stroke="var(--terracotta)" strokeWidth="1" strokeDasharray="4,3" />
-      <path d="M100 260 L280 260" stroke="var(--terracotta)" strokeWidth="1" />
-      <text x="190" y="280" textAnchor="middle" fontFamily="Caveat, cursive" fontSize="16" fill="var(--terracotta)">finding clearer paths together ✦</text>
-      <text x="30" y="40" fontFamily="serif" fontSize="14" fill="var(--terracotta)" opacity="0.5">✧</text>
-      <text x="340" y="250" fontFamily="serif" fontSize="12" fill="var(--terracotta)" opacity="0.5">✦</text>
-    </svg>
+    <img
+      src={founderLifeImage}
+      alt="Founder life — a hand-drawn sketch of the founder journey"
+      className="h-auto w-full select-none"
+      draggable={false}
+    />
   );
 }
 
 function Page2() {
-  const inputYs = [60, 120, 180, 240];
-  const hiddenYs = [80, 140, 200];
   return (
-    <svg viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg" className="h-auto w-full">
-      {inputYs.map((y, i) => <circle key={`in-${i}`} cx="50" cy={y} r="12" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />)}
-      {hiddenYs.map((y, i) => <circle key={`hidden-${i}`} cx="190" cy={y} r="14" fill="none" stroke="var(--terracotta)" strokeWidth="1.8" />)}
-      <circle cx="330" cy="140" r="18" fill="none" stroke="var(--terracotta)" strokeWidth="2" />
-      <text x="330" y="144" textAnchor="middle" fontFamily="Caveat, cursive" fontSize="11" fill="var(--terracotta)" fontWeight="600">AI</text>
-      {inputYs.map((y1) => hiddenYs.map((y2) => <line key={`${y1}-${y2}`} x1="62" y1={y1} x2="176" y2={y2} stroke="var(--terracotta)" strokeWidth="0.5" opacity="0.3" />))}
-      {hiddenYs.map((y) => <line key={`out-${y}`} x1="204" y1={y} x2="312" y2="140" stroke="var(--terracotta)" strokeWidth="0.8" opacity="0.4" />)}
-      <text x="50" y="275" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)" opacity="0.7">data</text>
-      <text x="190" y="245" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)" opacity="0.7">signals</text>
-      <text x="330" y="180" textAnchor="middle" fontFamily="JetBrains Mono" fontSize="8" fill="var(--terracotta)" opacity="0.7">direction</text>
-      <rect x="70" y="265" width="240" height="45" rx="4" fill="none" stroke="var(--terracotta)" strokeWidth="1.5" />
-      <text x="80" y="282" fontFamily="JetBrains Mono" fontSize="9" fill="var(--terracotta)" opacity="0.8">$ map_messy_ideas.py</text>
-      <text x="80" y="298" fontFamily="JetBrains Mono" fontSize="9" fill="var(--terracotta)" opacity="0.5">→ clearer direction ✓</text>
-      <text x="150" y="30" fontFamily="serif" fontSize="14" fill="var(--terracotta)" opacity="0.6">✦</text>
-      <text x="290" y="50" fontFamily="serif" fontSize="10" fill="var(--terracotta)" opacity="0.4">✧</text>
-    </svg>
+    <img
+      src={researcherPonytailImage}
+      alt="Researcher — a hand-drawn sketch of research work"
+      className="h-auto w-full select-none"
+      draggable={false}
+    />
+  );
+}
+
+function Page3() {
+  return (
+    <img
+      src={travelerCoupleImage}
+      alt="Traveler — a hand-drawn sketch of the journey so far"
+      className="h-auto w-full select-none"
+      draggable={false}
+    />
   );
 }
 
 function HeroIllustration({ page }) {
   if (page === 1) return <Page1 />;
   if (page === 2) return <Page2 />;
+  if (page === 3) return <Page3 />;
   return <Page0 />;
 }
 
@@ -412,7 +386,7 @@ function NotebookPageFrame({ children, activePage = 0, onDotClick }) {
         <div className="relative z-[2] flex items-center justify-between border-t-2 border-dashed border-[rgba(204,66,44,0.30)] bg-[#f1e5cf] px-6 py-3 md:px-14">
           <span className="font-hand text-[16px] text-terracotta/70">↓ keep scrolling to flip pages</span>
           <div className="flex items-center gap-2">
-            {[0, 1, 2].map((index) => (
+            {[0, 1, 2, 3].map((index) => (
               <button
                 key={index}
                 type="button"
@@ -442,7 +416,7 @@ function HeroPageContent({ page, activePage }) {
         >
           <div>
             <div className="mb-5 flex items-center gap-3">
-              <span className="rounded-sm border border-[rgba(204,66,44,0.30)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta/60">page {page.page} of 3</span>
+              <span className="rounded-sm border border-[rgba(204,66,44,0.30)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta/60">page {page.page} of 4</span>
               <span className="font-mono text-[10px] tracking-wide text-ink/40">{page.eyebrow}</span>
             </div>
             <div className="mb-4 font-hand text-[48px] font-bold leading-none text-terracotta md:text-[58px]">{page.name}</div>
@@ -454,8 +428,8 @@ function HeroPageContent({ page, activePage }) {
               {page.line.replace(/ ✧$/, "")} ✧
             </div>
             <div className="mt-2 flex flex-wrap gap-3">
-              <a href={activePage === 2 ? "/#research" : "/#story"} className="rounded border-2 border-terracotta bg-terracotta px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-terracottaDark">{page.primary}</a>
-              <a href={activePage === 2 ? "/blog" : "/#work"} className="rounded border-2 border-terracotta px-5 py-2.5 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta/10">{page.secondary}</a>
+              <a href={activePage === 3 ? "/#journey" : activePage === 2 ? "/#research" : "/#story"} className="rounded border-2 border-terracotta bg-terracotta px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-terracottaDark">{page.primary}</a>
+              <a href={activePage === 3 ? "/blog" : activePage === 2 ? "/blog" : "/#work"} className="rounded border-2 border-terracotta px-5 py-2.5 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta/10">{page.secondary}</a>
             </div>
           </div>
           <div className="mt-8 rotate-[-0.5deg] font-hand text-[15px] text-ink/40">{page.note}</div>
@@ -487,7 +461,7 @@ function Hero() {
 
   useEffect(() => {
     return scrollYProgress.on("change", (latest) => {
-      const nextPage = Math.min(2, Math.floor(Math.min(0.999, Math.max(0, latest)) * 3));
+      const nextPage = Math.min(3, Math.floor(Math.min(0.999, Math.max(0, latest)) * 4));
       setActivePage((current) => (current === nextPage ? current : nextPage));
     });
   }, [scrollYProgress]);
@@ -497,11 +471,11 @@ function Hero() {
     const rect = heroRef.current.getBoundingClientRect();
     const top = window.scrollY + rect.top;
     const totalScrollable = heroRef.current.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + (totalScrollable / 3) * index, behavior: "smooth" });
+    window.scrollTo({ top: top + (totalScrollable / 4) * index, behavior: "smooth" });
   };
 
   return (
-    <section ref={heroRef} id="top" className="relative h-[400vh] px-6">
+    <section ref={heroRef} id="top" className="relative h-[500vh] px-6">
       <div className="sticky top-14 mx-auto max-w-[860px] pt-4 pb-4">
         <NotebookMenu />
         <NotebookPageFrame activePage={activePage} onDotClick={scrollToHeroPage}>

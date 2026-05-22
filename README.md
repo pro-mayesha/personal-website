@@ -50,13 +50,13 @@ Reference prototypes: `proma_personal_website_ui.jsx`, `proma_personal_website_u
 
 | URL | Purpose |
 |-----|---------|
-| `/blog` | All published notes (same ruled “chaos note” layout) |
-| `/blog/:slug` | One note, e.g. `/blog/the-chaos-i-couldnt-ignore` |
-| `/admin` | Password login to write, edit, delete posts |
+| `/notes` | All published notes |
+| `/notes/:slug` | One note, e.g. `/notes/the-chaos-i-couldnt-ignore` |
+| `/admin` | Admin dashboard — create your ID/password once, then write, edit, delete posts |
 
-Posts are stored in **localStorage** in the browser. Use **Export JSON backup** on `/admin` regularly. Set `VITE_ADMIN_PASSWORD` in `.env` (see `.env.example`), then restart `npm run dev`.
+On first visit to `/admin`, create your **admin ID** and **password** (stored hashed in this browser). Sign in on later visits. Posts are stored in **localStorage** — use **Export JSON backup** on `/admin` regularly.
 
-**Security:** `VITE_*` values are compiled into the client JavaScript. Treat this as a **simple gate** for your personal workflow, not strong protection. For real access control, use a server-backed auth (e.g. Supabase Auth + RLS).
+**Security:** This is a **simple browser gate** for your personal workflow, not bank-grade auth. Anyone with devtools could inspect the site; for strong protection use server-backed auth later.
 
 | File | Purpose |
 |------|---------|

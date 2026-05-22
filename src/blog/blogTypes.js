@@ -6,11 +6,16 @@
  */
 
 /**
+ * @typedef {'personal' | 'research'} BlogCategory
+ */
+
+/**
  * @typedef {Object} BlogPost
  * @property {string} id
  * @property {string} slug
  * @property {string} title
  * @property {string} date
+ * @property {BlogCategory} [category]
  * @property {BlogParagraph[]} paragraphs
  * @property {string} pullQuote
  * @property {string} signature

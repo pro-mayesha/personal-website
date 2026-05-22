@@ -1,4 +1,9 @@
+import { normalizePostCategory } from "./blogCategories.js";
 import { defaultBlogPosts } from "./defaultBlogPosts.js";
+
+function withCategory(post) {
+  return { ...post, category: normalizePostCategory(post) };
+}
 
 const STORAGE_KEY = "proma_blog_posts_v1";
 
@@ -25,13 +30,31 @@ export function slugify(title) {
     .replace(/^-|-$/g, "") || "note";
 }
 
+function mergeDefaultPosts(stored) {
+  const merged = [...stored];
+  for (const seed of defaultBlogPosts) {
+    const i = merged.findIndex((p) => p.slug === seed.slug);
+    if (i === -1) {
+      merged.push(seed);
+    } else if (typeof seed.id === "string" && seed.id.startsWith("seed-")) {
+      merged[i] = { ...seed, id: merged[i].id };
+    }
+  }
+  return merged;
+}
+
 /** @returns {import("./blogTypes").BlogPost[]} */
 export function getAllBlogPosts() {
-  if (typeof window === "undefined") return [...defaultBlogPosts];
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  const parsed = raw ? safeParse(raw) : null;
-  if (!Array.isArray(parsed) || parsed.length === 0) return [...defaultBlogPosts];
-  return parsed;
+  const base =
+    typeof window === "undefined"
+      ? [...defaultBlogPosts]
+      : (() => {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          const parsed = raw ? safeParse(raw) : null;
+          if (!Array.isArray(parsed) || parsed.length === 0) return [...defaultBlogPosts];
+          return mergeDefaultPosts(parsed);
+        })();
+  return base.map(withCategory);
 }
 
 /** @param {import("./blogTypes").BlogPost[]} posts */
@@ -53,16 +76,17 @@ export function addBlogPost(draft) {
   if (posts.some((p) => p.slug === slug)) {
     throw new Error("That slug is already used. Pick another title or slug.");
   }
-  const post = {
+  const post = withCategory({
     id: crypto.randomUUID(),
     slug,
     title: draft.title.trim(),
     date: draft.date || new Date().toISOString().slice(0, 10),
+    category: draft.category,
     paragraphs: draft.paragraphs,
     pullQuote: draft.pullQuote?.trim() || "",
     signature: draft.signature?.trim() || "— Mayesha Maliha Proma",
     signatureMeta: draft.signatureMeta?.trim() || "from Bangladesh to Japan",
-  };
+  });
   posts.unshift(post);
   saveAllBlogPosts(posts);
   return post;
@@ -77,7 +101,7 @@ export function updateBlogPost(updated) {
   if (posts.some((p, j) => p.slug === slug && j !== i)) {
     throw new Error("That slug is already used.");
   }
-  posts[i] = { ...updated, slug, title: updated.title.trim() };
+  posts[i] = withCategory({ ...updated, slug, title: updated.title.trim() });
   saveAllBlogPosts(posts);
   return posts[i];
 }

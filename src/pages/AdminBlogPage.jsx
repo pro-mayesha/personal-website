@@ -9,22 +9,20 @@ import {
   slugify,
   updateBlogPost,
 } from "../blog/blogStorage.js";
+import {
+  changeAdminPassword,
+  createAdminAccount,
+  getAdminUserId,
+  hasAdminAccount,
+  isAdminLoggedIn,
+  setAdminLoggedIn,
+  verifyAdminLogin,
+} from "../blog/adminAuth.js";
+import { BLOG_CATEGORIES } from "../blog/blogCategories.js";
 import { NotebookStoryCard } from "../blog/NotebookStoryCard.jsx";
 
-const SESSION_KEY = "proma_blog_admin";
-
-function getAdminPassword() {
-  return import.meta.env.VITE_ADMIN_PASSWORD ?? "";
-}
-
-function isLoggedIn() {
-  return typeof window !== "undefined" && sessionStorage.getItem(SESSION_KEY) === "1";
-}
-
-function setLoggedIn(v) {
-  if (v) sessionStorage.setItem(SESSION_KEY, "1");
-  else sessionStorage.removeItem(SESSION_KEY);
-}
+const inputClass =
+  "w-full rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-garamond text-ink outline-none focus:border-terracotta";
 
 function emptyParagraph() {
   return { text: "", marginNote: "", highlighted: false };
@@ -36,6 +34,7 @@ function emptyForm() {
     title: "",
     slug: "",
     date: new Date().toISOString().slice(0, 10),
+    category: "personal",
     pullQuote: "",
     signature: "— Mayesha Maliha Proma",
     signatureMeta: "from Bangladesh to Japan",
@@ -44,13 +43,20 @@ function emptyForm() {
 }
 
 export function AdminBlogPage() {
-  const passwordConfigured = useMemo(() => Boolean(getAdminPassword().length), []);
-  const [loggedIn, setLogged] = useState(isLoggedIn);
+  const [accountReady, setAccountReady] = useState(hasAdminAccount);
+  const [loggedIn, setLogged] = useState(isAdminLoggedIn);
+  const [userIdInput, setUserIdInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [accountMessage, setAccountMessage] = useState("");
   const [error, setError] = useState("");
   const [posts, setPosts] = useState(() => getAllBlogPosts());
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const adminUserId = useMemo(() => getAdminUserId(), [loggedIn, accountReady]);
 
   useEffect(() => {
     const onChange = () => setPosts(getAllBlogPosts());
@@ -58,28 +64,69 @@ export function AdminBlogPage() {
     return () => window.removeEventListener("proma-posts-changed", onChange);
   }, []);
 
-  const tryLogin = (e) => {
+  const trySetup = async (e) => {
     e.preventDefault();
     setError("");
-    const expected = getAdminPassword();
-    if (!expected) {
-      setError("Set VITE_ADMIN_PASSWORD in a .env file (see .env.example), then restart npm run dev.");
+    if (passwordInput !== confirmPassword) {
+      setError("Passwords do not match.");
       return;
     }
-    if (passwordInput !== expected) {
-      setError("Wrong password.");
+    try {
+      await createAdminAccount(userIdInput, passwordInput);
+      setAccountReady(true);
+      setAdminLoggedIn(true);
+      setLogged(true);
+      setUserIdInput("");
+      setPasswordInput("");
+      setConfirmPassword("");
+    } catch (err) {
+      setError(err.message || "Could not create account.");
+    }
+  };
+
+  const tryLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await verifyAdminLogin(userIdInput, passwordInput);
+      setAdminLoggedIn(true);
+      setLogged(true);
+      setPasswordInput("");
+    } catch (err) {
+      setError(err.message || "Sign in failed.");
+    }
+  };
+
+  const tryChangePassword = async (e) => {
+    e.preventDefault();
+    setAccountMessage("");
+    setError("");
+    if (newPassword !== newPasswordConfirm) {
+      setError("New passwords do not match.");
       return;
     }
-    setLoggedIn(true);
-    setLogged(true);
-    setPasswordInput("");
+    try {
+      await changeAdminPassword(currentPassword, newPassword);
+      setCurrentPassword("");
+      setNewPassword("");
+      setNewPasswordConfirm("");
+      setAccountMessage("Password updated.");
+    } catch (err) {
+      setError(err.message || "Could not update password.");
+    }
   };
 
   const logout = () => {
-    setLoggedIn(false);
+    setAdminLoggedIn(false);
     setLogged(false);
     setForm(emptyForm());
     setEditingId(null);
+    setUserIdInput("");
+    setPasswordInput("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setNewPasswordConfirm("");
+    setAccountMessage("");
   };
 
   const loadPost = (p) => {
@@ -89,6 +136,7 @@ export function AdminBlogPage() {
       title: p.title,
       slug: p.slug,
       date: p.date,
+      category: p.category === "research" ? "research" : "personal",
       pullQuote: p.pullQuote || "",
       signature: p.signature || "",
       signatureMeta: p.signatureMeta || "",
@@ -116,6 +164,7 @@ export function AdminBlogPage() {
         title: form.title.trim(),
         slug: form.slug.trim() || slugify(form.title),
         date: form.date,
+        category: form.category === "research" ? "research" : "personal",
         paragraphs,
         pullQuote: form.pullQuote.trim(),
         signature: form.signature.trim(),
@@ -148,7 +197,7 @@ export function AdminBlogPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `proma-blog-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `proma-notes-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -172,39 +221,67 @@ export function AdminBlogPage() {
   };
 
   if (!loggedIn) {
+    const isSetup = !accountReady;
     return (
       <div className="mx-auto max-w-md px-6 pb-24 pt-24">
-        <Link to="/blog" className="mb-8 inline-block font-hand text-lg text-terracotta hover:underline">
-          ← blog
+        <Link to="/notes" className="mb-8 inline-block font-hand text-lg text-terracotta hover:underline">
+          ← notes
         </Link>
-        <h1 className="mb-2 font-hand text-4xl font-bold text-terracotta">Write notes</h1>
+        <h1 className="mb-2 font-hand text-4xl font-bold text-terracotta">Admin dashboard</h1>
         <p className="mb-6 font-garamond text-[15px] leading-relaxed text-ink/70">
-          Sign in with the password from your <code className="rounded bg-paperSoft px-1">.env</code> file (
-          <code className="rounded bg-paperSoft px-1">VITE_ADMIN_PASSWORD</code>). Posts save in this browser (
-          <strong>localStorage</strong>) — use <strong>Export JSON</strong> after login for backups.
+          {isSetup
+            ? "Create your private admin ID and password once on this browser. Only you can sign in and publish notes from here."
+            : "Sign in with your admin ID and password. Notes save in this browser — export JSON backups after you publish."}
         </p>
-        {!passwordConfigured ? (
-          <p className="mb-4 rounded-sm border border-terracotta/30 bg-paperSoft p-3 font-mono text-xs text-ink/80">
-            No password configured. Create <code>.env</code> with VITE_ADMIN_PASSWORD=your_secret and restart the dev server.
-          </p>
-        ) : null}
-        <form onSubmit={tryLogin} className="space-y-4">
-          <label className="block font-mono text-[10px] uppercase tracking-widest text-terracotta/60">password</label>
-          <input
-            type="password"
-            value={passwordInput}
-            onChange={(ev) => setPasswordInput(ev.target.value)}
-            className="w-full rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-garamond text-ink outline-none focus:border-terracotta"
-            autoComplete="current-password"
-          />
+        <form onSubmit={isSetup ? trySetup : tryLogin} className="space-y-4">
+          <label className="block space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">admin ID</span>
+            <input
+              type="text"
+              value={userIdInput}
+              onChange={(ev) => setUserIdInput(ev.target.value)}
+              className={inputClass}
+              autoComplete="username"
+              placeholder="e.g. proma"
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">password</span>
+            <input
+              type="password"
+              value={passwordInput}
+              onChange={(ev) => setPasswordInput(ev.target.value)}
+              className={inputClass}
+              autoComplete={isSetup ? "new-password" : "current-password"}
+              minLength={isSetup ? 8 : undefined}
+            />
+          </label>
+          {isSetup ? (
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">confirm password</span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(ev) => setConfirmPassword(ev.target.value)}
+                className={inputClass}
+                autoComplete="new-password"
+                minLength={8}
+              />
+            </label>
+          ) : null}
           {error ? <p className="font-garamond text-sm text-terracotta">{error}</p> : null}
           <button
             type="submit"
             className="rounded-sm border-2 border-terracotta bg-terracotta px-5 py-2 font-garamond text-paper transition-colors hover:bg-terracottaDark"
           >
-            Sign in
+            {isSetup ? "Create admin account" : "Sign in"}
           </button>
         </form>
+        {isSetup ? (
+          <p className="mt-4 font-mono text-[10px] leading-relaxed text-ink/45">
+            Password must be at least 8 characters. Your ID is stored on this device only (not in source code).
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -213,12 +290,14 @@ export function AdminBlogPage() {
     <div className="mx-auto max-w-[900px] space-y-12 px-6 pb-32 pt-20 lg:px-0">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-hand text-4xl font-bold text-terracotta">Blog admin</h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-ink/40">localStorage · export often</p>
+          <h1 className="font-hand text-4xl font-bold text-terracotta">Admin dashboard</h1>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-ink/40">
+            signed in as {adminUserId ?? "admin"} · export often
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link to="/blog" className="rounded-sm border-2 border-terracotta px-4 py-2 font-hand text-lg text-terracotta hover:bg-terracotta/10">
-            view blog
+          <Link to="/notes" className="rounded-sm border-2 border-terracotta px-4 py-2 font-hand text-lg text-terracotta hover:bg-terracotta/10">
+            view notes
           </Link>
           <button
             type="button"
@@ -231,12 +310,61 @@ export function AdminBlogPage() {
       </div>
 
       <section className="rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 shadow-[3px_4px_0_rgba(192,68,42,0.12)]">
+        <h2 className="mb-2 font-hand text-2xl font-bold text-terracotta">Account</h2>
+        <p className="mb-4 font-garamond text-[14px] text-ink/60">Change your password. Your admin ID stays the same.</p>
+        <form onSubmit={tryChangePassword} className="grid max-w-md gap-3">
+          <label className="block space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">current password</span>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className={inputClass}
+              autoComplete="current-password"
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">new password</span>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className={inputClass}
+              autoComplete="new-password"
+              minLength={8}
+            />
+          </label>
+          <label className="block space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">confirm new password</span>
+            <input
+              type="password"
+              value={newPasswordConfirm}
+              onChange={(e) => setNewPasswordConfirm(e.target.value)}
+              className={inputClass}
+              autoComplete="new-password"
+              minLength={8}
+            />
+          </label>
+          <button
+            type="submit"
+            className="w-fit rounded-sm border-2 border-[rgba(204,66,44,0.35)] px-4 py-2 font-garamond text-sm text-ink hover:border-terracotta"
+          >
+            Update password
+          </button>
+          {accountMessage ? <p className="font-garamond text-sm text-ink/70">{accountMessage}</p> : null}
+        </form>
+      </section>
+
+      <section className="rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 shadow-[3px_4px_0_rgba(192,68,42,0.12)]">
         <h2 className="mb-4 font-hand text-2xl font-bold text-terracotta">Published notes</h2>
         <ul className="space-y-2">
           {posts.map((p) => (
             <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-terracotta/10 py-2 last:border-0">
               <div>
                 <span className="font-garamond font-semibold text-ink">{p.title}</span>
+                <span className="ml-2 rounded-sm border border-terracotta/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-terracotta/70">
+                  {p.category === "research" ? "research" : "personal"}
+                </span>
                 <span className="ml-2 font-mono text-[10px] text-ink/40">{p.date}</span>
                 <span className="ml-2 font-mono text-[10px] text-terracotta/50">/{p.slug}</span>
               </div>
@@ -247,7 +375,7 @@ export function AdminBlogPage() {
                 <button type="button" onClick={() => removePost(p.id)} className="font-hand text-lg text-terracotta/50 hover:text-terracotta">
                   delete
                 </button>
-                <Link to={`/blog/${p.slug}`} className="font-hand text-lg text-ink/50 hover:text-terracotta">
+                <Link to={`/notes/${p.slug}`} className="font-hand text-lg text-ink/50 hover:text-terracotta">
                   view
                 </Link>
               </div>
@@ -292,7 +420,7 @@ export function AdminBlogPage() {
                 className="w-full rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-mono text-sm text-ink"
               />
             </label>
-            <label className="block space-y-1 md:col-span-2">
+            <label className="block space-y-1">
               <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">date</span>
               <input
                 type="date"
@@ -300,6 +428,17 @@ export function AdminBlogPage() {
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                 className="w-full max-w-xs rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-mono text-sm text-ink"
               />
+            </label>
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">category</span>
+              <select
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                className="w-full max-w-xs rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-garamond text-ink"
+              >
+                <option value="personal">{BLOG_CATEGORIES.personal.label}</option>
+                <option value="research">{BLOG_CATEGORIES.research.label}</option>
+              </select>
             </label>
           </div>
 

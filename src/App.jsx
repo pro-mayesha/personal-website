@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
-import { BrowserRouter, Link, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useParams } from "react-router-dom";
 import { NotebookStoryCard } from "./blog/NotebookStoryCard.jsx";
 import { defaultBlogPosts } from "./blog/defaultBlogPosts.js";
+import { BLOG_CATEGORIES, getPostExcerpt, normalizePostCategory } from "./blog/blogCategories.js";
 import { getAllBlogPosts } from "./blog/blogStorage.js";
 import { AdminBlogPage } from "./pages/AdminBlogPage.jsx";
 import { BlogIndexPage } from "./pages/BlogIndexPage.jsx";
 import { BlogPostPage } from "./pages/BlogPostPage.jsx";
+import { WorkSection } from "./components/WorkSection.jsx";
 import promaThankYouImage from "./assets/Proma-Thank-you.png";
 import founderLifeImage from "./assets/founder-life-simplified-dark.svg";
 import travelerCoupleImage from "./assets/traveler-couple-dark.svg";
@@ -31,7 +33,8 @@ const beliefs = [
   {
     num: "01",
     title: "Build, then refine",
-    desc: "A mediocre thing that exists beats a perfect thing that doesn’t. Ship it, learn from it, make it better.",
+    tagline: "Ship, test, improve",
+    desc: "A mediocre thing that exists beats a perfect thing that doesn’t. Learn, adjust, and make it better.",
     bg: "#fff4ef",
     rotate: "-rotate-[1.2deg]",
     tape: true,
@@ -46,65 +49,69 @@ const beliefs = [
   },
   {
     num: "02",
-    title: "People, not personas",
-    desc: "Real users are messier and more interesting than any user story. Talk to them first, always.",
+    title: "Find joy in the small things",
+    tagline: "Small moments, big impact",
+    desc: "Work, walk, or listen to music—life can always be fun. Small moments shape mood, creativity, and energy.",
     bg: "#fdf0ec",
     rotate: "rotate-[0.8deg]",
     tape: false,
     doodle: (
       <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <circle cx="19" cy="13" r="7" stroke="var(--terracotta)" strokeWidth="1.8" />
-        <path d="M8 34 Q8 26 19 26 Q30 26 30 34" stroke="var(--terracotta)" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="16" cy="14" r="1.2" fill="var(--terracotta)" />
-        <circle cx="22" cy="14" r="1.2" fill="var(--terracotta)" />
+        <path d="M8 22 Q19 8 30 22" stroke="var(--terracotta)" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="12" cy="26" r="2" fill="var(--terracotta)" />
+        <circle cx="19" cy="24" r="2" fill="var(--terracotta)" />
+        <circle cx="26" cy="26" r="2" fill="var(--terracotta)" />
+        <path d="M14 30h10" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
   {
     num: "03",
-    title: "Compound curiosity",
-    desc: "The best founders stay relentlessly curious. Every rabbit hole is a future insight waiting to happen.",
+    title: "Everything can be learned",
+    tagline: "Curiosity unlocks growth",
+    desc: "Curiosity is the key. Today you might not know something, tomorrow you can. Explore, try, and grow every day.",
     bg: "#fff8f5",
     rotate: "-rotate-[0.5deg]",
     tape: true,
     doodle: (
       <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <path d="M19 6 L22 16 L32 16 L24 22 L27 32 L19 26 L11 32 L14 22 L6 16 L16 16 Z" stroke="var(--terracotta)" strokeWidth="1.8" />
-        <circle cx="19" cy="19" r="3" fill="var(--terracotta)" />
+        <circle cx="19" cy="17" r="10" stroke="var(--terracotta)" strokeWidth="1.8" />
+        <path d="M19 11v6l4 3" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10 30 Q19 24 28 30" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
   },
 ];
 
-const workCards = [
-  {
-    tag: "THE MISSION",
-    title: "The Abroad Company",
-    desc: "Infrastructure for crossing borders. The bigger mission behind everything — fixing the broken study abroad system through mentorship, AI, and honest guidance.",
-    note: "this is the whole thing →",
-    bg: "#fff4ef",
-  },
-  {
-    tag: "BUILDING NOW",
-    title: "AbroadMates",
-    desc: "Peer-to-peer study abroad mentorship. Students talk to people who have actually done it — not sales agents. Real guidance from real experience.",
-    note: "launched & growing ✓",
-    bg: "#fdf0ec",
-  },
-  {
-    tag: "AI COPILOT",
-    title: "ApplicationMate",
-    desc: "AI-powered study abroad application guidance. Features Pearl, a friendly AI mascot, and tracks your full application journey.",
-    note: "Pearl is cute 🐚",
-    bg: "#fff8f5",
-  },
-  {
-    tag: "PERSONAL NOTES",
-    title: "Proma’s Notes",
-    desc: "My personal writing space. Where I share what confuses me, what I learn, and what may help others crossing borders of any kind.",
-    note: "you’re reading it ✦",
-    bg: "#fff4ef",
-  },
+
+function formatNoteDate(iso) {
+  if (!iso) return "";
+  const d = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function sortNotesNewestFirst(posts) {
+  return [...posts].sort((a, b) => {
+    const byDate = (b.date || "").localeCompare(a.date || "");
+    if (byDate !== 0) return byDate;
+    return a.title.localeCompare(b.title);
+  });
+}
+
+function isFounderNote(post) {
+  return (
+    post.slug === "founder-story" ||
+    post.slug === "the-chaos-i-couldnt-ignore" ||
+    /founder/i.test(post.title)
+  );
+}
+
+const NOTEBOOK_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "founder", label: "Founder" },
+  { id: "personal", label: "Personal" },
+  { id: "research", label: "Research" },
 ];
 
 const timeline = [
@@ -116,38 +123,6 @@ const timeline = [
   ["Now", "Building AI guidance tools", "ApplicationMate, writing intelligence, student-first tools, and public notes."],
 ];
 
-const posts = [
-  {
-    tag: "Founder Notes",
-    time: "6 min read",
-    date: "Jan 2025",
-    title: "I Decided to Organize the Chaos of Crossing Borders",
-    body: "The study abroad system is broken. Here’s why I decided to build the alternative and what it took to get started.",
-  },
-  {
-    tag: "AI Learning",
-    time: "8 min read",
-    date: "Feb 2025",
-    title: "How to Talk to AI So It Actually Understands You",
-    body: "A beginner-friendly guide to prompt engineering and getting consistently better outputs from LLMs.",
-  },
-  {
-    tag: "Building in Public",
-    time: "5 min read",
-    date: "Mar 2025",
-    title: "What I Learned Building AbroadMates From Scratch",
-    body: "Lessons from turning a frustrating personal experience into a platform real students actually use.",
-  },
-];
-
-const filters = [
-  [BookOpen, "Founder Notes"],
-  [Camera, "Travel Stories"],
-  [Shield, "Policy"],
-  [PenLine, "Thoughts"],
-  [Coffee, "Daily Logs"],
-  [Sparkles, "AI Learning"],
-];
 
 const archive = [
   [BookOpen, "Policy Papers", "Long-form analysis and research notes."],
@@ -159,53 +134,61 @@ const archive = [
 const heroPages = [
   {
     page: "1",
-    label: "cover",
-    eyebrow: "Founder / AI Researcher",
-    name: "Proma ✦",
-    title: "I organize the chaos of crossing borders.",
+    label: "proma hero",
+    eyebrow: "",
+    name: "Hi. I am Mayesha Maliha Proma ✦",
+    title: "Curious, diverse, leading my own way from the start.",
     meta: ["● Bangladesh", "↔ Japan", "● GMT+9"],
-    line: "building the future of study abroad, one tool at a time ✧",
+    line: "",
     primary: "Read my story",
+    primaryHref: "/notes/hi-im-mayesha-maliha-proma",
     secondary: "See my work",
+    secondaryHref: "/#work",
     note: "— written somewhere between Kawagoe & everywhere else",
     sketch: "app",
   },
   {
     page: "2",
     label: "founder story",
-    eyebrow: "The personal reason",
+    eyebrow: "Founder Story",
     name: "Founder ✦",
-    title: "I built a clearer path for students.",
+    title: "Everything draws me in, risk is fun, ventures solve.",
     meta: ["self-applied", "scholarship", "student-first"],
-    line: "turning confusion into clear next steps ✧",
-    primary: "The chaos",
-    secondary: "Selected work",
+    line: "",
+    primary: "Founder story",
+    primaryHref: "/notes/founder-story",
+    secondary: "The chaos",
+    secondaryHref: "/notes/the-chaos-i-couldnt-ignore",
     note: "— building the alternative I wish I had",
     sketch: "founder",
   },
   {
     page: "3",
     label: "research story",
-    eyebrow: "AI / NLP / Writing systems",
+    eyebrow: "Researcher",
     name: "Researcher ✦",
-    title: "I make AI clearer and more useful.",
+    title: "I go deep, ask the last question, learn from it.",
     meta: ["NLP", "essay intelligence", "student decisions"],
-    line: "turning messy writing into direction ✧",
+    line: "",
     primary: "Research work",
+    primaryHref: "/notes/researcher",
     secondary: "Read notes",
+    secondaryHref: "/notes",
     note: "— notebooks, models, and coffee",
     sketch: "research",
   },
   {
     page: "4",
     label: "traveler story",
-    eyebrow: "Notes from the road",
+    eyebrow: "Traveler",
     name: "Traveler ✦",
-    title: "I collect cities, conversations, and quiet mornings.",
+    title: "I follow, watch, think, and reflect on the world.",
     meta: ["✈ borders", "● slow travel", "✎ field notes"],
-    line: "every place teaches a different way to think ✧",
+    line: "",
     primary: "See the journey",
+    primaryHref: "/notes/traveler",
     secondary: "Travel notes",
+    secondaryHref: "/notes/traveler",
     note: "— passport stamps & cafés along the way",
     sketch: "travel",
   },
@@ -217,13 +200,13 @@ function SideRail({ right = false }) {
     [Lightbulb, "story", "/#story"],
     [Star, "work", "/#work"],
     [PenLine, "research", "/#research"],
-    [BookOpen, "blog", "/blog"],
+    [BookOpen, "notes", "/notes"],
   ];
 
   const rightItems = [
     [Camera, "images", "/#work"],
     [Globe2, "travel", "/#journey"],
-    [Coffee, "notes", "/blog"],
+    [Coffee, "notes", "/notes"],
     [Heart, "mentor", "/#connect"],
     [Mail, "connect", "/#connect"],
   ];
@@ -260,7 +243,7 @@ function NotebookMenu() {
         ["story", "/#story"],
         ["work", "/#work"],
         ["research", "/#research"],
-        ["blog", "/blog"],
+        ["notes", "/notes"],
         ["connect", "/#connect"],
       ].map(([label, href]) => (
         <a key={label} href={href} className="transition hover:-translate-y-0.5 hover:text-terracotta">
@@ -277,7 +260,7 @@ function SectionTitle({ id, children, rightLabel }) {
       <h2 className="whitespace-nowrap font-hand text-[34px] font-bold leading-none text-terracotta md:text-[42px]">{children}</h2>
       <div className="h-px flex-1 bg-terracotta/22" />
       {rightLabel ? (
-        <Link to="/blog" className="font-hand text-xl text-terracotta/70">
+        <Link to="/notes" className="font-hand text-xl text-terracotta/70">
           {rightLabel}
         </Link>
       ) : (
@@ -402,6 +385,21 @@ function NotebookPageFrame({ children, activePage = 0, onDotClick }) {
   );
 }
 
+function HeroCtaLink({ href, className, children }) {
+  if (href.startsWith("/notes") || href === "/admin") {
+    return (
+      <Link to={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  );
+}
+
 function HeroPageContent({ page, activePage }) {
   return (
     <div className="flex min-h-[520px] flex-col md:flex-row">
@@ -417,19 +415,33 @@ function HeroPageContent({ page, activePage }) {
           <div>
             <div className="mb-5 flex items-center gap-3">
               <span className="rounded-sm border border-[rgba(204,66,44,0.30)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta/60">page {page.page} of 4</span>
-              <span className="font-mono text-[10px] tracking-wide text-ink/40">{page.eyebrow}</span>
+              {page.eyebrow ? (
+                <span className="font-mono text-[10px] tracking-wide text-ink/40">{page.eyebrow}</span>
+              ) : null}
             </div>
             <div className="mb-4 font-hand text-[48px] font-bold leading-none text-terracotta md:text-[58px]">{page.name}</div>
             <h1 className="mb-6 max-w-[420px] font-garamond text-[32px] font-semibold leading-[1.1] tracking-tight text-ink md:text-[48px]">
               {page.title}
             </h1>
             <div className="mb-6 font-mono text-[11px] tracking-wider text-ink/50">◉ {page.meta.join("  •  ")}</div>
-            <div className="mb-6 inline-block border-b-[2.5px] border-[rgba(204,66,44,0.40)] pb-1 font-hand text-[19px] font-semibold text-terracotta">
-              {page.line.replace(/ ✧$/, "")} ✧
-            </div>
+            {page.line ? (
+              <div className="mb-6 inline-block border-b-[2.5px] border-[rgba(204,66,44,0.40)] pb-1 font-hand text-[19px] font-semibold text-terracotta">
+                {page.line.replace(/ ✧$/, "")} ✧
+              </div>
+            ) : null}
             <div className="mt-2 flex flex-wrap gap-3">
-              <a href={activePage === 3 ? "/#journey" : activePage === 2 ? "/#research" : "/#story"} className="rounded border-2 border-terracotta bg-terracotta px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-terracottaDark">{page.primary}</a>
-              <a href={activePage === 3 ? "/blog" : activePage === 2 ? "/blog" : "/#work"} className="rounded border-2 border-terracotta px-5 py-2.5 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta/10">{page.secondary}</a>
+              <HeroCtaLink
+                href={page.primaryHref}
+                className="rounded border-2 border-terracotta bg-terracotta px-5 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-terracottaDark"
+              >
+                {page.primary}
+              </HeroCtaLink>
+              <HeroCtaLink
+                href={page.secondaryHref}
+                className="rounded border-2 border-terracotta px-5 py-2.5 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta/10"
+              >
+                {page.secondary}
+              </HeroCtaLink>
             </div>
           </div>
           <div className="mt-8 rotate-[-0.5deg] font-hand text-[15px] text-ink/40">{page.note}</div>
@@ -489,11 +501,14 @@ function Hero() {
 function BeliefsSection() {
   return (
     <section id="about" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
-      <div className="mb-8 flex items-baseline gap-3">
+      <div className="mb-4 flex items-baseline gap-3">
         <h2 className="font-hand text-[32px] font-bold text-terracotta md:text-[36px]">3 things I strongly believe in</h2>
         <div className="h-[2px] flex-1 self-center bg-terracotta/20" />
         <span className="font-hand text-lg text-ink/40">✍︎</span>
       </div>
+      <p className="mb-8 max-w-[640px] font-garamond text-[17px] italic leading-relaxed text-ink/60">
+        This list keeps changing — but right now, these are the three I strongly believe in.
+      </p>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
         {beliefs.map((belief, index) => (
@@ -516,7 +531,8 @@ function BeliefsSection() {
             <div className="relative z-[1]">
               <span className="mb-3 block font-mono text-[10px] tracking-widest text-terracotta/50">{belief.num}</span>
               <div className="mb-3">{belief.doodle}</div>
-              <h3 className="mb-2 font-hand text-[23px] font-bold text-ink">{belief.title}</h3>
+              <h3 className="mb-1 font-hand text-[23px] font-bold text-ink">{belief.title}</h3>
+              <p className="mb-2 font-hand text-[15px] font-semibold text-terracotta">{belief.tagline}</p>
               <p className="font-garamond text-[15px] leading-relaxed text-ink/65">{belief.desc}</p>
             </div>
           </motion.div>
@@ -528,7 +544,10 @@ function BeliefsSection() {
 
 function getChaosPost() {
   const all = getAllBlogPosts();
-  return all.find((p) => p.slug === "the-chaos-i-couldnt-ignore") || defaultBlogPosts[0];
+  return (
+    all.find((p) => p.slug === "the-chaos-i-couldnt-ignore") ||
+    defaultBlogPosts.find((p) => p.slug === "the-chaos-i-couldnt-ignore")
+  );
 }
 
 function StorySection() {
@@ -540,6 +559,10 @@ function StorySection() {
     return () => window.removeEventListener("proma-posts-changed", fn);
   }, []);
 
+  const previewCount = 2;
+  const preview = chaos.paragraphs.slice(0, previewCount);
+  const hasMore = chaos.paragraphs.length > previewCount;
+
   return (
     <section id="story" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
       <div className="mb-8 flex items-baseline gap-3">
@@ -549,61 +572,22 @@ function StorySection() {
       </div>
 
       <NotebookStoryCard
-        paragraphs={chaos.paragraphs}
-        pullQuote={chaos.pullQuote}
+        paragraphs={preview}
+        pullQuote={hasMore ? "" : chaos.pullQuote}
         signature={chaos.signature}
         signatureMeta={chaos.signatureMeta}
       />
 
-      <div className="mt-6 text-center">
-        <Link
-          to={`/blog/${chaos.slug}`}
-          className="border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[18px] text-terracotta transition-colors hover:border-terracotta"
-        >
-          read as published note →
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-function WorkSection() {
-  return (
-    <section id="work" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
-      <div className="mb-8 flex items-baseline gap-3">
-        <h2 className="font-hand text-[32px] font-bold text-terracotta md:text-[36px]">Selected work</h2>
-        <div className="h-[2px] flex-1 self-center bg-terracotta/20" />
-        <span className="font-hand text-lg text-ink/40">✍︎</span>
-      </div>
-
-      <div className="space-y-4">
-        {workCards.map((venture, index) => (
-          <motion.div
-            key={venture.title}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: index * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative cursor-pointer overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.30)] transition-transform hover:-translate-x-[2px] hover:-translate-y-[2px]"
-            style={{ backgroundColor: venture.bg, boxShadow: "3px 4px 0 rgba(192,68,42,0.18)" }}
+      {hasMore ? (
+        <div className="mt-6 text-center">
+          <Link
+            to={`/notes/${chaos.slug}`}
+            className="inline-block border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[20px] text-terracotta transition-colors hover:border-terracotta"
           >
-            <div className="absolute inset-0 bg-lines opacity-40 pointer-events-none" />
-            <div className="relative z-[1] flex items-start gap-5 p-5 md:p-6">
-              <div className="flex-1">
-                <div className="mb-2 flex flex-wrap items-center gap-3">
-                  <span className="rounded-sm border border-[rgba(204,66,44,0.40)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta">
-                    {venture.tag}
-                  </span>
-                  <span className="hidden font-hand text-[14px] text-ink/40 md:inline">{venture.note}</span>
-                </div>
-                <h3 className="mb-1.5 font-garamond text-[22px] font-bold text-ink">{venture.title}</h3>
-                <p className="font-garamond text-[15px] leading-relaxed text-ink/60">{venture.desc}</p>
-              </div>
-              <span className="self-center flex-shrink-0 font-hand text-[28px] text-terracotta/50 transition-transform group-hover:translate-x-1">→</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            Read the full write-up →
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -757,7 +741,12 @@ function MentorshipSection() {
               ))}
             </div>
 
-            <a href="/#connect" className="inline-flex items-center gap-2 rounded-sm border-2 border-terracotta bg-terracotta px-6 py-3 font-garamond text-[16px] text-paper transition-colors hover:bg-terracottaDark">
+            <a
+              href="https://abroadmates.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm border-2 border-terracotta bg-terracotta px-6 py-3 font-garamond text-[16px] text-paper transition-colors hover:bg-terracottaDark"
+            >
               Book a session through AbroadMates
               <span className="font-hand text-lg">→</span>
             </a>
@@ -827,59 +816,110 @@ function JourneySection() {
 }
 
 function NotesSection() {
+  const [notes, setNotes] = useState(() => sortNotesNewestFirst(getAllBlogPosts()));
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    const refresh = () => setNotes(sortNotesNewestFirst(getAllBlogPosts()));
+    window.addEventListener("proma-posts-changed", refresh);
+    return () => window.removeEventListener("proma-posts-changed", refresh);
+  }, []);
+
+  const visibleNotes = useMemo(() => {
+    if (filter === "all") return notes;
+    if (filter === "founder") return notes.filter(isFounderNote);
+    if (filter === "personal") return notes.filter((p) => normalizePostCategory(p) === "personal");
+    if (filter === "research") return notes.filter((p) => normalizePostCategory(p) === "research");
+    return notes;
+  }, [notes, filter]);
+
   return (
-    <section id="notes" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
+    <section id="notebook" className="mx-auto w-full max-w-[900px] scroll-mt-28 px-6 lg:px-0">
       <div className="mb-8 flex items-baseline gap-3">
         <h2 className="font-hand text-[32px] font-bold text-terracotta md:text-[36px]">From the notebook</h2>
         <div className="h-[2px] flex-1 self-center bg-terracotta/20" />
-        <Link to="/blog" className="flex-shrink-0 font-hand text-[16px] text-terracotta/60 transition-colors hover:text-terracotta">
-          all posts →
+        <Link to="/notes" className="shrink-0 font-hand text-[16px] text-terracotta/60 transition-colors hover:text-terracotta">
+          all notes →
         </Link>
       </div>
 
-      <p className="mb-8 font-garamond text-[18px] italic text-ink/65">
-        I write to think. Here’s what’s been on my mind lately.
+      <p className="mb-2 font-garamond text-[15px] leading-relaxed text-ink/65">
+        Founder stories, personal notes, and research essays. Newest first.
+      </p>
+      <p className="mb-8 font-garamond text-[14px] text-ink/55">
+        Filter:{" "}
+        {NOTEBOOK_FILTERS.map((tab, index) => (
+          <span key={tab.id}>
+            {index > 0 ? " · " : null}
+            <button
+              type="button"
+              onClick={() => setFilter(tab.id)}
+              className={
+                filter === tab.id
+                  ? "text-terracotta underline decoration-terracotta/50 underline-offset-2"
+                  : "hover:text-terracotta"
+              }
+            >
+              {tab.label}
+            </button>
+          </span>
+        ))}
       </p>
 
-      <div className="space-y-4">
-        {posts.map((post, index) => (
-          <motion.article
-            key={post.title}
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: index * 0.07 }}
-            className="group relative cursor-pointer overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft transition-all hover:-translate-y-[1px] hover:shadow-md"
-            style={{ boxShadow: "3px 3px 0 rgba(192,68,42,0.12)" }}
-          >
-            <div className="absolute inset-0 bg-lines opacity-30 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 top-0 w-[4px] bg-terracotta" />
+      {notes.length === 0 ? (
+        <p className="font-garamond text-[16px] italic text-ink/50">No notes published yet.</p>
+      ) : visibleNotes.length === 0 ? (
+        <p className="font-garamond text-[16px] italic text-ink/50">No notes in this filter yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {visibleNotes.map((post, index) => {
+            const category = BLOG_CATEGORIES[normalizePostCategory(post)];
+            return (
+              <motion.article
+                key={post.id}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ delay: index * 0.07 }}
+                className="group relative overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft transition-all hover:-translate-y-[1px] hover:shadow-md"
+                style={{ boxShadow: "3px 3px 0 rgba(192,68,42,0.12)" }}
+              >
+                <div className="absolute inset-0 bg-lines opacity-30 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 top-0 w-[4px] bg-terracotta" />
 
-            <div className="relative z-[1] flex items-start gap-4 py-5 pl-6 pr-5">
-              <div className="flex-1">
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <span className="rounded-sm border border-[rgba(204,66,44,0.40)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta">
-                    {post.tag}
+                <Link to={`/notes/${post.slug}`} className="relative z-[1] flex items-start gap-4 py-5 pl-6 pr-5">
+                  <div className="flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <span className="rounded-sm border border-[rgba(204,66,44,0.40)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-terracotta">
+                        {category.tag}
+                      </span>
+                      <span className="font-hand text-[13px] text-ink/30">{formatNoteDate(post.date)}</span>
+                    </div>
+                    <h3 className="mb-1.5 font-garamond text-[20px] font-semibold leading-snug text-ink transition-colors group-hover:text-terracotta">
+                      {post.title}
+                    </h3>
+                    <p className="font-garamond text-[15px] leading-relaxed text-ink/55">{getPostExcerpt(post, 140)}</p>
+                  </div>
+                  <span className="flex-shrink-0 self-center font-hand text-[26px] text-terracotta/40 transition-all group-hover:translate-x-1 group-hover:text-terracotta">
+                    →
                   </span>
-                  <span className="font-mono text-[10px] text-ink/30">{post.time}</span>
-                  <span className="font-hand text-[13px] text-ink/30">{post.date}</span>
-                </div>
-                <h3 className="mb-1.5 font-garamond text-[20px] font-semibold leading-snug text-ink transition-colors group-hover:text-terracotta">
-                  {post.title}
-                </h3>
-                <p className="font-garamond text-[15px] leading-relaxed text-ink/55">{post.body}</p>
-              </div>
-              <span className="self-center flex-shrink-0 font-hand text-[26px] text-terracotta/40 transition-all group-hover:translate-x-1 group-hover:text-terracotta">→</span>
-            </div>
-          </motion.article>
-        ))}
-      </div>
+                </Link>
+              </motion.article>
+            );
+          })}
+        </div>
+      )}
 
-      <div className="mt-6 text-center">
-        <Link to="/blog" className="border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[18px] text-terracotta transition-colors hover:border-terracotta">
-          read all posts ✦
-        </Link>
-      </div>
+      {notes.length > 0 ? (
+        <div className="mt-6 text-center">
+          <Link
+            to="/notes"
+            className="inline-block border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[18px] text-terracotta transition-colors hover:border-terracotta"
+          >
+            read all notes ✦
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -995,14 +1035,21 @@ function HomePage() {
   );
 }
 
+function LegacyBlogPostRedirect() {
+  const { slug } = useParams();
+  return <Navigate to={slug ? `/notes/${slug}` : "/notes"} replace />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<SiteLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/blog" element={<BlogIndexPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/notes" element={<BlogIndexPage />} />
+          <Route path="/notes/:slug" element={<BlogPostPage />} />
+          <Route path="/blog" element={<Navigate to="/notes" replace />} />
+          <Route path="/blog/:slug" element={<LegacyBlogPostRedirect />} />
           <Route path="/admin" element={<AdminBlogPage />} />
         </Route>
       </Routes>

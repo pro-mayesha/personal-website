@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #f6efe3;
+  --paperSoft: #fff8ef;
+  --terracotta: #cc422c;
+  --terracottaDark: #9b2e20;
+  --ink: #37231e;
+  --muted: #917b72;
+  --line: #e9b2a2;
+  --note: #fff0b8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+mark {
+  color: var(--ink);
+}

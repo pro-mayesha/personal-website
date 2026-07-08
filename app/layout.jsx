@@ -1,5 +1,6 @@
 import { Caveat, EB_Garamond } from "next/font/google";
 import { SiteLayout } from "@/components/SiteLayout";
+import { site } from "@/lib/content/site";
 import "./globals.css";
 
 const caveat = Caveat({
@@ -15,10 +16,32 @@ const garamond = EB_Garamond({
   variable: "--font-garamond",
 });
 
+const siteName = site.siteName || "Personal website";
+const defaultTitle = site.defaultTitle || siteName;
+const defaultDescription = site.defaultDescription || "";
+const ogImages = site.ogImage ? [{ url: site.ogImage }] : undefined;
+
 export const metadata = {
-  title: "Mayesha Maliha Proma",
-  description:
-    "Proma — Founder, AI researcher, and builder of student-first study abroad tools.",
+  ...(site.siteUrl ? { metadataBase: new URL(site.siteUrl) } : {}),
+  title: {
+    default: defaultTitle,
+    template: `%s · ${siteName}`,
+  },
+  description: defaultDescription,
+  openGraph: {
+    type: "website",
+    siteName,
+    title: defaultTitle,
+    description: defaultDescription,
+    ...(site.siteUrl ? { url: site.siteUrl } : {}),
+    ...(ogImages ? { images: ogImages } : {}),
+  },
+  twitter: {
+    card: ogImages ? "summary_large_image" : "summary",
+    title: defaultTitle,
+    description: defaultDescription,
+    ...(ogImages ? { images: ogImages } : {}),
+  },
 };
 
 export default function RootLayout({ children }) {

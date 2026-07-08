@@ -1,11 +1,9 @@
 const STYLES = {
-  published: "border-terracotta bg-terracotta text-paper",
-  "under-review": "border-ink/25 bg-paperSoft text-ink/80",
-  "in-progress": "border-terracotta/25 bg-note/60 text-terracottaDark",
-  "research-idea": "border-dashed border-muted/50 bg-paper text-muted",
-  "working-paper": "border-terracotta/30 bg-[#fff4ef] text-terracottaDark",
-  founder: "border-terracotta/40 bg-terracotta/10 text-terracottaDark",
-  research: "border-ink/20 bg-paperSoft text-ink/70",
+  published: "border-transparent bg-terracotta text-white",
+  "under-review": "border-ink/25 bg-white text-ink/70",
+  "in-progress": "border-terracotta bg-white text-terracotta",
+  "research-idea": "border-dashed border-terracotta/50 bg-white text-terracotta/80",
+  "working-paper": "border-terracotta bg-white text-terracotta",
 };
 
 const LABELS = {
@@ -14,17 +12,14 @@ const LABELS = {
   "in-progress": "In Progress",
   "research-idea": "Research Idea",
   "working-paper": "Working Paper",
-  founder: "Founder",
-  research: "Research",
 };
 
 export function StatusTag({ status }) {
-  const style = STYLES[status] || STYLES.research;
+  const style = STYLES[status] || STYLES["under-review"];
   const label = LABELS[status] || status;
-
   return (
     <span
-      className={`inline-flex shrink-0 items-center rounded-sm border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] ${style}`}
+      className={`inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] ${style}`}
     >
       {label}
     </span>

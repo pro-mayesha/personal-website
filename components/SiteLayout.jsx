@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import {
   BookOpen,
   Camera,
@@ -58,6 +59,13 @@ function SideRail({ right = false }) {
 }
 
 export function SiteLayout({ children }) {
+  const pathname = usePathname();
+  const bareLayout = pathname === "/academic";
+
+  if (bareLayout) {
+    return <div className="min-h-screen bg-paper text-ink">{children}</div>;
+  }
+
   return (
     <div className="min-h-screen bg-paper text-ink">
       <SideRail />

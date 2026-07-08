@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "next/link";
+import Link from "next/link";
 import { BlogPostCard } from "@/lib/blog/BlogPostCard";
 import { BLOG_CATEGORIES, groupPostsByCategory } from "@/lib/blog/blogCategories";
 import { useBlogPosts } from "@/lib/blog/useBlogPosts";

@@ -8,6 +8,19 @@ import { BLOG_CATEGORIES, getPostExcerpt, normalizePostCategory } from "@/lib/bl
 import { NotebookStoryCard } from "@/lib/blog/NotebookStoryCard";
 import { useBlogPosts } from "@/lib/blog/useBlogPosts";
 import { WorkSection } from "@/components/WorkSection";
+import { links } from "@/lib/content/links";
+import {
+  heroPages,
+  notebookMenu,
+  beliefs,
+  journeyMilestones,
+  archiveItems,
+  researchAreas,
+  researchTerminalLines,
+  mentorshipAreas,
+  mentorshipCta,
+  notebookFilters,
+} from "@/lib/content/homepage";
 import {
   BookOpen,
   Camera,
@@ -18,64 +31,38 @@ import {
   Lightbulb,
   Mail,
   PenLine,
-  Shield,
-  Sparkles,
   Star,
 } from "lucide-react";
 
-const beliefs = [
-  {
-    num: "01",
-    title: "Build, then refine",
-    tagline: "Ship, test, improve",
-    desc: "A mediocre thing that exists beats a perfect thing that doesn’t. Learn, adjust, and make it better.",
-    bg: "#fff4ef",
-    rotate: "-rotate-[1.2deg]",
-    tape: true,
-    doodle: (
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <rect x="4" y="4" width="30" height="30" rx="4" stroke="var(--terracotta)" strokeWidth="1.8" />
-        <path d="M10 14h18M10 19h14M10 24h16" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="29" cy="10" r="5" fill="var(--paper)" stroke="var(--terracotta)" strokeWidth="1.5" />
-        <path d="M27 10h4M29 8v4" stroke="var(--terracotta)" strokeWidth="1.3" />
-      </svg>
-    ),
-  },
-  {
-    num: "02",
-    title: "Find joy in the small things",
-    tagline: "Small moments, big impact",
-    desc: "Work, walk, or listen to music—life can always be fun. Small moments shape mood, creativity, and energy.",
-    bg: "#fdf0ec",
-    rotate: "rotate-[0.8deg]",
-    tape: false,
-    doodle: (
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <path d="M8 22 Q19 8 30 22" stroke="var(--terracotta)" strokeWidth="1.8" strokeLinecap="round" />
-        <circle cx="12" cy="26" r="2" fill="var(--terracotta)" />
-        <circle cx="19" cy="24" r="2" fill="var(--terracotta)" />
-        <circle cx="26" cy="26" r="2" fill="var(--terracotta)" />
-        <path d="M14 30h10" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    num: "03",
-    title: "Everything can be learned",
-    tagline: "Curiosity unlocks growth",
-    desc: "Curiosity is the key. Today you might not know something, tomorrow you can. Explore, try, and grow every day.",
-    bg: "#fff8f5",
-    rotate: "-rotate-[0.5deg]",
-    tape: true,
-    doodle: (
-      <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-        <circle cx="19" cy="17" r="10" stroke="var(--terracotta)" strokeWidth="1.8" />
-        <path d="M19 11v6l4 3" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M10 30 Q19 24 28 30" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
+// Hand-drawn doodles for the beliefs cards (presentation only; text lives in homepage.js).
+const BELIEF_DOODLES = [
+  (
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <rect x="4" y="4" width="30" height="30" rx="4" stroke="var(--terracotta)" strokeWidth="1.8" />
+      <path d="M10 14h18M10 19h14M10 24h16" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="29" cy="10" r="5" fill="var(--paper)" stroke="var(--terracotta)" strokeWidth="1.5" />
+      <path d="M27 10h4M29 8v4" stroke="var(--terracotta)" strokeWidth="1.3" />
+    </svg>
+  ),
+  (
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <path d="M8 22 Q19 8 30 22" stroke="var(--terracotta)" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="26" r="2" fill="var(--terracotta)" />
+      <circle cx="19" cy="24" r="2" fill="var(--terracotta)" />
+      <circle cx="26" cy="26" r="2" fill="var(--terracotta)" />
+      <path d="M14 30h10" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  (
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+      <circle cx="19" cy="17" r="10" stroke="var(--terracotta)" strokeWidth="1.8" />
+      <path d="M19 11v6l4 3" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M10 30 Q19 24 28 30" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
 ];
+
+const ARCHIVE_ICONS = { BookOpen, FileText, Coffee, Camera };
 
 
 function formatNoteDate(iso) {
@@ -100,93 +87,6 @@ function isFounderNote(post) {
     /founder/i.test(post.title)
   );
 }
-
-const NOTEBOOK_FILTERS = [
-  { id: "all", label: "All" },
-  { id: "founder", label: "Founder" },
-  { id: "personal", label: "Personal" },
-  { id: "research", label: "Research" },
-];
-
-const timeline = [
-  ["2018", "Early curiosity in Bangladesh", "Leadership, organizing, and a growing urge to fix broken systems."],
-  ["2020", "Applied abroad independently", "Rejected the agency model. Self-applied to universities across North America, Europe, and Asia."],
-  ["2021", "Full-tuition scholarship to Japan", "Moved to Tokyo International University to study Digital Business & Innovation."],
-  ["2022", "Started AbroadMates", "Built a peer-to-peer mentorship platform so students could talk to people who actually walked the path."],
-  ["2023", "Co-founded The Abroad Company", "The bigger mission: building infrastructure for crossing borders."],
-  ["Now", "Building AI guidance tools", "ApplicationMate, writing intelligence, student-first tools, and public notes."],
-];
-
-
-const archive = [
-  [BookOpen, "Policy Papers", "Long-form analysis and research notes."],
-  [FileText, "Policy Briefs", "Short pieces for action and clarity."],
-  [Coffee, "Podcast", "Conversations on AI, ambition, and borders."],
-  [Camera, "Travel Stories", "Personal notes from Japan, Bangladesh, and elsewhere."],
-];
-
-const heroPages = [
-  {
-    page: "1",
-    label: "proma hero",
-    eyebrow: "",
-    name: "Hi. I am Mayesha Maliha Proma ✦",
-    title: "Curious, diverse, leading my own way from the start.",
-    meta: ["● Bangladesh", "↔ Japan", "● GMT+9"],
-    line: "",
-    primary: "Read my story",
-    primaryHref: "/notes/hi-im-mayesha-maliha-proma",
-    secondary: "See my work",
-    secondaryHref: "/#work",
-    note: "— written somewhere between Kawagoe & everywhere else",
-    sketch: "app",
-  },
-  {
-    page: "2",
-    label: "founder story",
-    eyebrow: "Founder Story",
-    name: "Founder ✦",
-    title: "Everything draws me in, risk is fun, ventures solve.",
-    meta: ["self-applied", "scholarship", "student-first"],
-    line: "",
-    primary: "Founder story",
-    primaryHref: "/notes/founder-story",
-    secondary: "The chaos",
-    secondaryHref: "/notes/the-chaos-i-couldnt-ignore",
-    note: "— building the alternative I wish I had",
-    sketch: "founder",
-  },
-  {
-    page: "3",
-    label: "research story",
-    eyebrow: "Researcher",
-    name: "Researcher ✦",
-    title: "I go deep, ask the last question, learn from it.",
-    meta: ["NLP", "essay intelligence", "student decisions"],
-    line: "",
-    primary: "Research work",
-    primaryHref: "/notes/researcher",
-    secondary: "Read notes",
-    secondaryHref: "/notes",
-    note: "— notebooks, models, and coffee",
-    sketch: "research",
-  },
-  {
-    page: "4",
-    label: "traveler story",
-    eyebrow: "Traveler",
-    name: "Traveler ✦",
-    title: "I follow, watch, think, and reflect on the world.",
-    meta: ["✈ borders", "● slow travel", "✎ field notes"],
-    line: "",
-    primary: "See the journey",
-    primaryHref: "/notes/traveler",
-    secondary: "Travel notes",
-    secondaryHref: "/notes/traveler",
-    note: "— passport stamps & cafés along the way",
-    sketch: "travel",
-  },
-];
 
 function SideRail({ right = false }) {
   const leftItems = [
@@ -232,15 +132,7 @@ function SideRail({ right = false }) {
 function NotebookMenu() {
   return (
     <nav className="mb-5 flex justify-center gap-9 font-hand text-[22px] text-muted">
-      {[
-        ["about", "/#about"],
-        ["story", "/#story"],
-        ["work", "/#work"],
-        ["research", "/#research"],
-        ["academic", "/academic"],
-        ["notes", "/notes"],
-        ["connect", "/#connect"],
-      ].map(([label, href]) => (
+      {notebookMenu.map(([label, href]) => (
         <a key={label} href={href} className="transition hover:-translate-y-0.5 hover:text-terracotta">
           {label}
         </a>
@@ -525,7 +417,7 @@ function BeliefsSection() {
             <div className="absolute inset-0 rounded-sm bg-lines opacity-50 pointer-events-none" />
             <div className="relative z-[1]">
               <span className="mb-3 block font-mono text-[10px] tracking-widest text-terracotta/50">{belief.num}</span>
-              <div className="mb-3">{belief.doodle}</div>
+              <div className="mb-3">{BELIEF_DOODLES[index]}</div>
               <h3 className="mb-1 font-hand text-[23px] font-bold text-ink">{belief.title}</h3>
               <p className="mb-2 font-hand text-[15px] font-semibold text-terracotta">{belief.tagline}</p>
               <p className="font-garamond text-[15px] leading-relaxed text-ink/65">{belief.desc}</p>
@@ -580,21 +472,7 @@ function StorySection() {
 }
 
 function ResearchSection() {
-  const researchAreas = [
-    { label: "AI/ML Personalization", note: "my main focus" },
-    { label: "Natural Language Processing", note: "BERT, transformers" },
-    { label: "Automated Essay Scoring", note: "for applications" },
-    { label: "Data Science (HarvardX)", note: "ongoing" },
-    { label: "Prompt Engineering", note: "also teaching others" },
-  ];
-
-  const terminalLines = [
-    { text: "$ python train_model.py", className: "text-cream/70" },
-    { text: "→ Loading BERT model...", className: "text-cream/35" },
-    { text: "→ Processing essay embeddings...", className: "text-cream/35" },
-    { text: "→ accuracy: 94.2% ✓", className: "text-orange-200 font-semibold" },
-    { text: "→ Model ready for deployment", className: "text-cream/35" },
-  ];
+  const terminalLines = researchTerminalLines;
 
   return (
     <section id="research" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
@@ -681,14 +559,7 @@ function ResearchSection() {
 }
 
 function MentorshipSection() {
-  const areas = [
-    "Japan applications & student life",
-    "TIU applications & scholarships",
-    "SOP & essay strategy",
-    "Application planning & timelines",
-    "AI/data science learning path",
-    "Self-application (skip the agents)",
-  ];
+  const areas = mentorshipAreas;
 
   return (
     <section className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
@@ -729,12 +600,12 @@ function MentorshipSection() {
             </div>
 
             <a
-              href="https://abroadmates.com"
+              href={mentorshipCta.href || links.abroadMates}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm border-2 border-terracotta bg-terracotta px-6 py-3 font-garamond text-[16px] text-paper transition-colors hover:bg-terracottaDark"
             >
-              Book a session through AbroadMates
+              {mentorshipCta.label}
               <span className="font-hand text-lg">→</span>
             </a>
           </div>
@@ -745,15 +616,7 @@ function MentorshipSection() {
 }
 
 function JourneySection() {
-  const milestones = [
-    { year: "2018", title: "Early curiosity in Bangladesh", desc: "Leadership, organizing, and a growing urge to fix broken systems.", note: "the seeds ✦" },
-    { year: "2020", title: "Applied abroad independently", desc: "Rejected the agency model. Self-applied to universities across North America, Europe, and Asia.", note: "scary but right" },
-    { year: "2021", title: "Full-tuition scholarship to Japan", desc: "Moved to Tokyo International University to study Digital Business & Innovation.", note: "!!!!! 🎉" },
-    { year: "2022", title: "Started AbroadMates", desc: "Built a peer-to-peer mentorship platform so students could talk to people who actually walked the path.", note: "live!" },
-    { year: "2023", title: "Co-founded The Abroad Company", desc: "The bigger mission: building infrastructure for crossing borders.", note: "with Rahat ✦" },
-    { year: "2024", title: "Building ApplicationMate", desc: "An AI copilot for study abroad — powered by Pearl, a friendly AI mascot.", note: "Pearl is adorable" },
-    { year: "2025", title: "AI research & writing publicly", desc: "Personalization research, essay scoring, and writing honestly about all of it.", note: "← you are here" },
-  ];
+  const milestones = journeyMilestones;
 
   return (
     <section id="journey" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
@@ -831,7 +694,7 @@ function NotesSection() {
       </p>
       <p className="mb-8 font-garamond text-[14px] text-ink/55">
         Filter:{" "}
-        {NOTEBOOK_FILTERS.map((tab, index) => (
+        {notebookFilters.map((tab, index) => (
           <span key={tab.id}>
             {index > 0 ? " · " : null}
             <button
@@ -898,7 +761,7 @@ function NotesSection() {
       {notes.length > 0 ? (
         <div className="mt-6 text-center">
           <Link
-            to="/notes"
+            href="/notes"
             className="inline-block border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[18px] text-terracotta transition-colors hover:border-terracotta"
           >
             read all notes ✦
@@ -919,25 +782,28 @@ function ArchiveSection() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        {archive.map(([Icon, title, body], index) => (
-          <motion.a
-            key={title}
-            href="/#connect"
-            initial={{ opacity: 0, y: 14 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ delay: index * 0.06 }}
-            className="relative overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 transition-transform hover:-translate-y-[2px]"
-            style={{ boxShadow: "3px 4px 0 rgba(192,68,42,0.14)" }}
-          >
-            <div className="absolute inset-0 bg-lines opacity-35 pointer-events-none" />
-            <div className="relative z-[1]">
-              <Icon className="mb-5 text-terracotta" size={28} />
-              <h3 className="font-hand text-[24px] font-bold leading-none text-ink">{title}</h3>
-              <p className="mt-3 font-garamond text-[15px] leading-relaxed text-ink/60">{body}</p>
-            </div>
-          </motion.a>
-        ))}
+        {archiveItems.map((item, index) => {
+          const Icon = ARCHIVE_ICONS[item.icon] || BookOpen;
+          return (
+            <motion.a
+              key={item.title}
+              href="/#connect"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ delay: index * 0.06 }}
+              className="relative overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 transition-transform hover:-translate-y-[2px]"
+              style={{ boxShadow: "3px 4px 0 rgba(192,68,42,0.14)" }}
+            >
+              <div className="absolute inset-0 bg-lines opacity-35 pointer-events-none" />
+              <div className="relative z-[1]">
+                <Icon className="mb-5 text-terracotta" size={28} />
+                <h3 className="font-hand text-[24px] font-bold leading-none text-ink">{item.title}</h3>
+                <p className="mt-3 font-garamond text-[15px] leading-relaxed text-ink/60">{item.body}</p>
+              </div>
+            </motion.a>
+          );
+        })}
       </div>
     </section>
   );

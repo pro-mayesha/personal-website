@@ -1,10 +1,15 @@
-export function SectionHeader({ id, title, subtitle }) {
+export function SectionHeader({ id, title, action }) {
   return (
-    <header id={id} className="scroll-mt-28 border-b border-terracotta/15 pb-4">
-      <h2 className="font-hand text-[28px] font-bold leading-tight text-terracotta md:text-[32px]">{title}</h2>
-      {subtitle ? (
-        <p className="mt-2 max-w-2xl font-garamond text-[16px] leading-relaxed text-ink/65">{subtitle}</p>
+    <div id={id} className="mb-6 flex scroll-mt-24 items-end justify-between gap-4">
+      <h2 className="font-garamond text-[26px] font-semibold leading-tight text-ink md:text-[30px]">{title}</h2>
+      {action ? (
+        <a
+          href={action.href}
+          className="shrink-0 text-[13px] font-medium text-terracotta transition-colors hover:text-terracottaDark"
+        >
+          {action.label} →
+        </a>
       ) : null}
-    </header>
+    </div>
   );
 }

@@ -1,66 +1,20 @@
-import { ExternalLink, FileText, Github } from "lucide-react";
 import Link from "next/link";
-import { AcademicTag } from "./AcademicTag";
+import { ExternalLink, FileText, Github } from "lucide-react";
+import { CategoryTag } from "./CategoryTag";
 import { StatusTag } from "./StatusTag";
 
-export function ResearchCard({ item }) {
-  return (
-    <article className="rounded-sm border-2 border-[rgba(204,66,44,0.22)] bg-paperSoft p-5 shadow-card md:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 className="max-w-xl font-garamond text-[19px] font-semibold leading-snug text-ink md:text-[21px]">
-          {item.title}
-        </h3>
-        <StatusTag status={item.status} />
-      </div>
-
-      <p className="mt-3 font-garamond text-[15px] leading-relaxed text-ink/75">{item.summary}</p>
-
-      <dl className="mt-4 space-y-2 border-t border-terracotta/10 pt-4 text-[14px]">
-        <div>
-          <dt className="font-mono text-[10px] uppercase tracking-widest text-muted">My role</dt>
-          <dd className="mt-0.5 font-garamond text-ink/80">{item.role}</dd>
-        </div>
-        {item.methods?.length > 0 ? (
-          <div>
-            <dt className="font-mono text-[10px] uppercase tracking-widest text-muted">Methods</dt>
-            <dd className="mt-1.5 flex flex-wrap gap-1.5">
-              {item.methods.map((m) => (
-                <AcademicTag key={m}>{m}</AcademicTag>
-              ))}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
-
-      {item.bullets?.length > 0 ? (
-        <ul className="mt-4 list-inside list-disc space-y-1.5 font-garamond text-[14px] leading-relaxed text-ink/70">
-          {item.bullets.map((bullet) => (
-            <li key={bullet}>{bullet}</li>
-          ))}
-        </ul>
-      ) : null}
-
-      <div className="mt-5 flex flex-wrap gap-3 border-t border-terracotta/10 pt-4">
-        <ResearchLink href={item.links?.paper} icon={FileText} label="Paper" />
-        <ResearchLink href={item.links?.github} icon={Github} label="GitHub" />
-        <ResearchLink href={item.links?.notes} icon={ExternalLink} label="Notes" internal />
-      </div>
-    </article>
-  );
-}
-
-function ResearchLink({ href, icon: Icon, label, internal }) {
+function ResearchLink({ href, icon: Icon, label }) {
   if (!href || href === "#") {
     return (
-      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-ink/30">
+      <span className="inline-flex items-center gap-1 text-[11px] font-medium text-ink/25">
         <Icon size={12} aria-hidden />
         {label}
       </span>
     );
   }
   const className =
-    "inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-terracotta transition-colors hover:text-terracottaDark";
-  if (internal || href.startsWith("/")) {
+    "inline-flex items-center gap-1 text-[11px] font-medium text-terracotta transition-colors hover:text-terracottaDark";
+  if (href.startsWith("/")) {
     return (
       <Link href={href} className={className}>
         <Icon size={12} aria-hidden />
@@ -73,5 +27,48 @@ function ResearchLink({ href, icon: Icon, label, internal }) {
       <Icon size={12} aria-hidden />
       {label}
     </a>
+  );
+}
+
+export function ResearchCard({ item, wide = false }) {
+  return (
+    <article className="flex h-full flex-col rounded-2xl border-[1.5px] border-line bg-white p-5 shadow-[0_2px_10px_rgba(55,35,30,0.05)]">
+      <StatusTag status={item.status} />
+
+      <h3 className="mt-3 font-garamond text-[18px] font-semibold leading-snug text-ink">{item.title}</h3>
+
+      {item.summary ? (
+        <p className={`mt-2 text-[14px] leading-relaxed text-ink/70 ${wide ? "" : "flex-1"}`}>{item.summary}</p>
+      ) : null}
+
+      <div className={`mt-3 grid gap-3 ${wide ? "sm:grid-cols-2" : ""}`}>
+        {item.role ? (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">My role</p>
+            <p className="mt-0.5 text-[13px] text-ink/80">{item.role}</p>
+          </div>
+        ) : null}
+        {item.methods?.length ? (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Methods</p>
+            <p className="mt-0.5 text-[13px] text-ink/80">{item.methods.join(" · ")}</p>
+          </div>
+        ) : null}
+      </div>
+
+      {item.tags?.length ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {item.tags.map((tag) => (
+            <CategoryTag key={tag}>{tag}</CategoryTag>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="mt-4 flex flex-wrap gap-4 border-t border-line pt-3">
+        <ResearchLink href={item.links?.paper} icon={FileText} label="Paper" />
+        <ResearchLink href={item.links?.github} icon={Github} label="GitHub" />
+        <ResearchLink href={item.links?.notes} icon={ExternalLink} label="Notes" />
+      </div>
+    </article>
   );
 }

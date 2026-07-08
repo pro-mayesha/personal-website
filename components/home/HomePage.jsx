@@ -237,6 +237,7 @@ function NotebookMenu() {
         ["story", "/#story"],
         ["work", "/#work"],
         ["research", "/#research"],
+        ["academic", "/academic"],
         ["notes", "/notes"],
         ["connect", "/#connect"],
       ].map(([label, href]) => (
@@ -542,9 +543,12 @@ function StorySection() {
     posts.find((p) => p.slug === "the-chaos-i-couldnt-ignore") ||
     defaultBlogPosts.find((p) => p.slug === "the-chaos-i-couldnt-ignore");
 
+  if (!chaos) return null;
+
+  const paragraphs = chaos.paragraphs || [];
   const previewCount = 2;
-  const preview = chaos.paragraphs.slice(0, previewCount);
-  const hasMore = chaos.paragraphs.length > previewCount;
+  const preview = paragraphs.slice(0, previewCount);
+  const hasMore = paragraphs.length > previewCount;
 
   return (
     <section id="story" className="w-full max-w-[900px] mx-auto px-6 lg:px-0 scroll-mt-28">
@@ -564,7 +568,7 @@ function StorySection() {
       {hasMore ? (
         <div className="mt-6 text-center">
           <Link
-            to={`/notes/${chaos.slug}`}
+            href={`/notes/${chaos.slug}`}
             className="inline-block border-b-2 border-[rgba(204,66,44,0.40)] pb-0.5 font-hand text-[20px] text-terracotta transition-colors hover:border-terracotta"
           >
             Read the full write-up →

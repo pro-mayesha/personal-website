@@ -5,6 +5,7 @@ import {
   Camera,
   Coffee,
   Globe2,
+  GraduationCap,
   Heart,
   Lightbulb,
   Mail,
@@ -18,6 +19,7 @@ function SideRail({ right = false }) {
     [Lightbulb, "story", "/#story"],
     [Star, "work", "/#work"],
     [PenLine, "research", "/#research"],
+    [GraduationCap, "academic", "/academic"],
     [BookOpen, "notes", "/notes"],
   ];
 

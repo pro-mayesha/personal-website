@@ -1,5 +1,7 @@
 const STYLES = {
   published: "border-transparent bg-terracotta text-white",
+  ongoing: "border-terracotta bg-terracotta/10 text-terracotta",
+  "manuscript-revision": "border-ink/25 bg-white text-ink/70",
   "under-review": "border-ink/25 bg-white text-ink/70",
   "in-progress": "border-terracotta bg-white text-terracotta",
   "research-idea": "border-dashed border-terracotta/50 bg-white text-terracotta/80",
@@ -8,6 +10,8 @@ const STYLES = {
 
 const LABELS = {
   published: "Published",
+  ongoing: "Ongoing Research",
+  "manuscript-revision": "Manuscript in Revision",
   "under-review": "Under Review",
   "in-progress": "In Progress",
   "research-idea": "Research Idea",

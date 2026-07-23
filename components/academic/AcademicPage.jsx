@@ -6,7 +6,7 @@ import {
   BookOpen,
   Compass,
   Download,
-  FileText,
+  FlaskConical,
   GraduationCap,
   Github,
   Link2,
@@ -21,20 +21,21 @@ import { SectionHeader } from "./SectionHeader";
 import { CategoryTag } from "./CategoryTag";
 import { DetailCard } from "./DetailCard";
 import { ResearchCard } from "./ResearchCard";
-import { ProjectCard } from "./ProjectCard";
-import { TimelineItem } from "./TimelineItem";
+import { CompanyStrip } from "./CompanyStrip";
+import { ProductPlatformCard } from "./ProductPlatformCard";
 import { SkillGroup } from "./SkillGroup";
 import { LinkButton } from "./LinkButton";
+import { ExpandableBio } from "./ExpandableBio";
+import { PortraitCard } from "./PortraitCard";
+import { WritingSection } from "./WritingSection";
+import { ExperienceEducationSection } from "./ExperienceEducationSection";
 
 import { profile } from "@/lib/content/profile";
 import { links } from "@/lib/content/links";
 import { academic } from "@/lib/content/academic";
-import { researchInterests, researchPapers, workingPapers } from "@/lib/content/research";
+import { researchInterests, ongoingResearch, researchPapers } from "@/lib/content/research";
 import { projects } from "@/lib/content/projects";
-import { educationItems } from "@/lib/content/education";
-import { experienceItems } from "@/lib/content/experience";
 import { skillGroups } from "@/lib/content/skills";
-import { researchNotes } from "@/lib/content/notes";
 
 const ICONS = { BookOpen, Compass, GraduationCap, Link2, Users, PenLine };
 
@@ -47,66 +48,77 @@ function byOrder(a, b) {
   return (a.order ?? 0) - (b.order ?? 0);
 }
 
-function formatNoteDate(iso) {
-  if (!iso) return "";
-  const d = new Date(`${iso}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
 export default function AcademicPage() {
   const cvHref = profile.cvUrl || links.cv;
   const emailHref = `mailto:${links.email}`;
 
-  const education = [...educationItems].sort(byOrder);
-  const experience = [...experienceItems].sort(byOrder);
-  const sortedProjects = [...projects].sort(byOrder);
-  const notes = researchNotes.filter((note) => note.published);
+  const academicProjects = [...projects]
+    .filter((project) => project.showOnAcademic)
+    .sort(byOrder);
+  const parentCompany = academicProjects.find((project) => project.role === "parent");
+  const productPlatforms = academicProjects.filter((project) => project.role === "product");
 
   return (
     <div className="min-h-screen bg-white font-sans text-ink">
       <AcademicNav />
 
       {/* Hero */}
-      <section className="mx-auto max-w-5xl px-5 pb-10 pt-12 md:px-8 md:pt-16">
-        <div className="max-w-3xl">
-          <h1 className="font-garamond text-[44px] font-bold leading-[1.05] text-ink md:text-[60px]">
-            {profile.fullName}
-          </h1>
-          <p className="mt-2 text-[15px] font-semibold text-terracotta">
-            {academic.hero.roles.join("  ·  ")}
-          </p>
-          <p className="mt-5 text-[17px] leading-relaxed text-ink/75 md:text-[18px]">
-            {academic.hero.story}
-          </p>
+      <section className="academic-hero mx-auto max-w-5xl px-5 pb-10 pt-12 md:px-8 md:pt-16">
+        <div className="academic-hero__grid">
+          {/* Left: identity + bio + actions */}
+          <div className="min-w-0">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-terracotta">
+              Research & CV
+            </p>
+            <h1 className="academic-hero__name">{profile.fullName}</h1>
+            <p className="mt-2 text-[13px] font-medium leading-snug text-terracotta md:text-[14px]">
+              {academic.hero.roles.join("  |  ")}
+            </p>
 
-          {academic.credibilityStrip?.length ? (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {academic.credibilityStrip.map((item) => (
-                <CategoryTag key={item}>{item}</CategoryTag>
-              ))}
+            <ExpandableBio paragraphs={profile.bio?.paragraphs || []} className="mt-5" />
+
+            {academic.hero.topicTags?.length ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {academic.hero.topicTags.map((tag) => (
+                  <CategoryTag key={tag}>{tag}</CategoryTag>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {academic.hero.buttons.map((button, index) => {
+                const isPrimary = index === 0;
+                const className = isPrimary
+                  ? "inline-flex items-center gap-2 rounded-lg border border-terracotta bg-terracotta px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-terracottaDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
+                  : "inline-flex items-center gap-2 rounded-lg border border-terracotta/40 bg-white px-4 py-2.5 text-[14px] font-medium text-terracotta transition-colors hover:bg-terracotta/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta";
+
+                if (button.href.startsWith("/")) {
+                  return (
+                    <Link key={button.label} href={button.href} className={className}>
+                      {button.label}
+                      {isPrimary ? <ArrowRight size={15} aria-hidden /> : null}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <a key={button.label} href={button.href} className={className}>
+                    {button.label}
+                    {button.label === "Contact Me" ? <Mail size={15} aria-hidden /> : null}
+                    {button.label === "Publications" ? <ArrowRight size={15} aria-hidden /> : null}
+                  </a>
+                );
+              })}
             </div>
-          ) : null}
+          </div>
 
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href={academic.hero.publicationsHref}
-              className="inline-flex items-center gap-2 rounded-lg border border-terracotta bg-terracotta px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-terracottaDark"
-            >
-              View Publications <ArrowRight size={15} aria-hidden />
-            </a>
-            <a
-              href={emailHref}
-              className="inline-flex items-center gap-2 rounded-lg border border-terracotta/40 bg-white px-4 py-2.5 text-[14px] font-medium text-terracotta transition-colors hover:bg-terracotta/10"
-            >
-              Contact Me <Mail size={15} aria-hidden />
-            </a>
-            <a
-              href={cvHref}
-              className="inline-flex items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-[14px] font-medium text-ink/75 transition-colors hover:border-terracotta/60 hover:text-terracotta"
-            >
-              <Download size={15} aria-hidden /> Download CV
-            </a>
+          {/* Right: pinned polaroid */}
+          <div className="academic-hero__portrait">
+            <PortraitCard
+              src={profile.portraitImage}
+              alt={`Portrait of ${profile.fullName}`}
+              caption={profile.portraitCaption || "Mayesha, in ink"}
+            />
           </div>
         </div>
 
@@ -116,13 +128,44 @@ export default function AcademicPage() {
             <DetailCard key={card.title} className="flex flex-col">
               <Icon name={card.icon} size={20} className="text-terracotta" aria-hidden />
               <h3 className="mt-3 font-garamond text-[17px] font-semibold text-ink">{card.title}</h3>
-              <p className="mt-1.5 flex-1 text-[13.5px] leading-relaxed text-ink/70">{card.body}</p>
-              <a
-                href={card.action.href}
-                className="mt-3 inline-flex items-center gap-1 text-[13px] font-medium text-terracotta transition-colors hover:text-terracottaDark"
-              >
-                {card.action.label} →
-              </a>
+
+              {card.links?.length ? (
+                <p className="mt-1.5 flex-1 text-[13.5px] leading-relaxed text-ink/70">
+                  {card.links.map((item, index) => {
+                    const href = links[item.hrefKey] || "#";
+                    const isInternal = href.startsWith("/");
+                    const link = isInternal ? (
+                      <Link key={item.label} href={href} className="card-link">
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <a
+                        key={item.label}
+                        href={href}
+                        className="card-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {item.label}
+                      </a>
+                    );
+                    return (
+                      <span key={item.label}>
+                        {index > 0 ? <span> · </span> : null}
+                        {link}
+                      </span>
+                    );
+                  })}
+                </p>
+              ) : (
+                <p className="mt-1.5 flex-1 text-[13.5px] leading-relaxed text-ink/70">{card.body}</p>
+              )}
+
+              {card.action ? (
+                <a href={card.action.href} className="card-link mt-3 inline-flex items-center gap-1 text-[13px] font-medium">
+                  {card.action.label} →
+                </a>
+              ) : null}
             </DetailCard>
           ))}
         </div>
@@ -153,9 +196,24 @@ export default function AcademicPage() {
           </div>
         </section>
 
-        {/* Selected Papers */}
+        {/* Ongoing Research */}
         <section>
-          <SectionHeader id="papers" title="Selected Papers & Projects" action={{ label: "View all publications", href: "#" }} />
+          <SectionHeader id="current-research" title="Ongoing Research" />
+          <div className="grid gap-4">
+            <ResearchCard item={ongoingResearch} wide />
+          </div>
+        </section>
+
+        {/* Selected Publications & Manuscripts */}
+        <section>
+          <SectionHeader
+            id="papers"
+            title="Selected Publications & Manuscripts"
+            action={{
+              label: "View publication record",
+              href: links.dblp,
+            }}
+          />
           <div className="grid gap-4 md:grid-cols-3">
             {researchPapers.map((paper) => (
               <ResearchCard key={paper.title} item={paper} />
@@ -163,77 +221,35 @@ export default function AcademicPage() {
           </div>
         </section>
 
-        {/* Working Papers */}
+        {/* Products & Research Platforms */}
         <section>
-          <SectionHeader id="working-papers" title="Working Papers" />
-          <div className="grid gap-4">
-            {workingPapers.map((paper) => (
-              <ResearchCard key={paper.title} item={paper} wide />
-            ))}
-          </div>
-        </section>
-
-        {/* Projects */}
-        <section>
-          <SectionHeader id="projects" title="Projects" />
-          <div className="grid gap-4 md:grid-cols-3">
-            {sortedProjects.map((project) => (
-              <ProjectCard key={project.title} project={project} />
-            ))}
-          </div>
-        </section>
-
-        {/* Reading Notes */}
-        <section>
-          <SectionHeader id="notes" title="Reading Notes / Paper Reflections" action={{ label: "See all notes", href: links.notes }} />
-          {academic.notesIntro ? (
-            <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-ink/70">{academic.notesIntro}</p>
+          <SectionHeader id="projects" title="Products & Research Platforms" />
+          {academic.productsIntro ? (
+            <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-ink/70">{academic.productsIntro}</p>
           ) : null}
-          <div className="grid gap-4 md:grid-cols-3">
-            {notes.map((note) => (
-              <Link key={note.title} href={note.slug ? `${links.notes}/${note.slug}` : links.notes} className="group block h-full">
-                <DetailCard className="flex h-full flex-col transition-colors group-hover:border-terracotta/60">
-                  <div className="flex items-center gap-2 text-terracotta/70">
-                    <FileText size={15} aria-hidden />
-                    <span className="text-[11px] font-medium text-muted">{formatNoteDate(note.date)}</span>
-                  </div>
-                  <h3 className="mt-2 font-garamond text-[16px] font-semibold leading-snug text-ink group-hover:text-terracotta">
-                    {note.title}
-                  </h3>
-                  <p className="mt-1.5 flex-1 text-[13.5px] leading-relaxed text-ink/70">{note.excerpt}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {note.tags.map((tag) => (
-                      <CategoryTag key={tag}>{tag}</CategoryTag>
-                    ))}
-                  </div>
-                </DetailCard>
-              </Link>
-            ))}
+
+          <div className="space-y-5">
+            {parentCompany ? <CompanyStrip company={parentCompany} /> : null}
+
+            <div className="grid gap-5 md:grid-cols-2 md:items-stretch">
+              {productPlatforms.map((product) => (
+                <ProductPlatformCard key={product.title} product={product} />
+              ))}
+            </div>
+
+            <p className="flex items-start justify-center gap-2 pt-2 text-center text-[13px] leading-relaxed text-ink/60 md:items-center">
+              <FlaskConical size={15} className="mt-0.5 shrink-0 text-terracotta md:mt-0" aria-hidden />
+              <span>
+                These products create real-world environments for studying how human and AI support shape
+                decisions and outcomes.
+              </span>
+            </p>
           </div>
         </section>
 
-        {/* Experience & Education */}
-        <section>
-          <SectionHeader id="experience" title="Experience & Education" />
-          <div className="grid gap-10 md:grid-cols-2">
-            <div>
-              <h3 className="mb-5 text-[12px] font-bold uppercase tracking-[0.16em] text-muted">Experience</h3>
-              <div className="space-y-6">
-                {experience.map((item) => (
-                  <TimelineItem key={item.role + item.organization} {...item} />
-                ))}
-              </div>
-            </div>
-            <div id="education" className="scroll-mt-24">
-              <h3 className="mb-5 text-[12px] font-bold uppercase tracking-[0.16em] text-muted">Education</h3>
-              <div className="space-y-6">
-                {education.map((item) => (
-                  <TimelineItem key={item.degree + item.institution} {...item} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <WritingSection />
+
+        <ExperienceEducationSection />
 
         {/* Skills */}
         <section>
@@ -270,7 +286,10 @@ export default function AcademicPage() {
               GitHub
             </LinkButton>
             <LinkButton href={links.notes} icon={BookOpen} className="transition-colors hover:text-terracotta">
-              Notes
+              Research Notebook
+            </LinkButton>
+            <LinkButton href={links.medium} icon={PenLine} className="transition-colors hover:text-terracotta">
+              Medium
             </LinkButton>
             <LinkButton href={cvHref} icon={Download} className="font-medium text-terracotta transition-colors hover:text-terracottaDark" showDisabled>
               Download CV

@@ -6,6 +6,8 @@ export function ProjectCard({ project }) {
   const href = project.links?.website || project.links?.notes || "";
   const hasLink = href && href !== "#";
   const isExternal = href.startsWith("http");
+  const myWork = project.myWork || project.whatIBuilt || "";
+  const researchValue = project.researchValue || "";
 
   const arrow = hasLink ? (
     isExternal ? (
@@ -13,7 +15,7 @@ export function ProjectCard({ project }) {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="shrink-0 text-terracotta/50 transition-colors hover:text-terracotta"
+        className="shrink-0 text-terracotta/50 transition-colors hover:text-terracotta focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
         aria-label={`Open ${project.title}`}
       >
         <ArrowUpRight size={18} />
@@ -21,7 +23,7 @@ export function ProjectCard({ project }) {
     ) : (
       <Link
         href={href}
-        className="shrink-0 text-terracotta/50 transition-colors hover:text-terracotta"
+        className="shrink-0 text-terracotta/50 transition-colors hover:text-terracotta focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta"
         aria-label={`Open ${project.title}`}
       >
         <ArrowUpRight size={18} />
@@ -43,26 +45,30 @@ export function ProjectCard({ project }) {
 
       <p className="mt-2 flex-1 text-[14px] leading-relaxed text-ink/70">{project.summary}</p>
 
-      <dl className="mt-3 space-y-1.5 border-t border-line pt-3 text-[13px]">
-        {project.whatIBuilt ? (
-          <div>
-            <dt className="inline text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Built </dt>
-            <dd className="inline text-ink/80">{project.whatIBuilt}</dd>
-          </div>
-        ) : null}
-        {project.whyItMatters ? (
-          <div>
-            <dt className="inline text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Why </dt>
-            <dd className="inline text-ink/80">{project.whyItMatters}</dd>
-          </div>
-        ) : null}
-      </dl>
+      {myWork || researchValue ? (
+        <dl className="mt-3 space-y-2 border-t border-line pt-3 text-[13px]">
+          {myWork ? (
+            <div>
+              <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">My work</dt>
+              <dd className="mt-0.5 text-ink/80">{myWork}</dd>
+            </div>
+          ) : null}
+          {researchValue ? (
+            <div>
+              <dt className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Research value</dt>
+              <dd className="mt-0.5 text-ink/80">{researchValue}</dd>
+            </div>
+          ) : null}
+        </dl>
+      ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {project.tags.map((tag) => (
-          <CategoryTag key={tag}>{tag}</CategoryTag>
-        ))}
-      </div>
+      {project.tags?.length ? (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {project.tags.map((tag) => (
+            <CategoryTag key={tag}>{tag}</CategoryTag>
+          ))}
+        </div>
+      ) : null}
     </article>
   );
 }

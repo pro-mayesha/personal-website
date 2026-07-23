@@ -37,7 +37,7 @@ import {
 // Hand-drawn doodles for the beliefs cards (presentation only; text lives in homepage.js).
 const BELIEF_DOODLES = [
   (
-    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+    <svg key="belief-doodle-1" width="38" height="38" viewBox="0 0 38 38" fill="none">
       <rect x="4" y="4" width="30" height="30" rx="4" stroke="var(--terracotta)" strokeWidth="1.8" />
       <path d="M10 14h18M10 19h14M10 24h16" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
       <circle cx="29" cy="10" r="5" fill="var(--paper)" stroke="var(--terracotta)" strokeWidth="1.5" />
@@ -45,7 +45,7 @@ const BELIEF_DOODLES = [
     </svg>
   ),
   (
-    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+    <svg key="belief-doodle-2" width="38" height="38" viewBox="0 0 38 38" fill="none">
       <path d="M8 22 Q19 8 30 22" stroke="var(--terracotta)" strokeWidth="1.8" strokeLinecap="round" />
       <circle cx="12" cy="26" r="2" fill="var(--terracotta)" />
       <circle cx="19" cy="24" r="2" fill="var(--terracotta)" />
@@ -54,7 +54,7 @@ const BELIEF_DOODLES = [
     </svg>
   ),
   (
-    <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+    <svg key="belief-doodle-3" width="38" height="38" viewBox="0 0 38 38" fill="none">
       <circle cx="19" cy="17" r="10" stroke="var(--terracotta)" strokeWidth="1.8" />
       <path d="M19 11v6l4 3" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M10 30 Q19 24 28 30" stroke="var(--terracotta)" strokeWidth="1.5" strokeLinecap="round" />

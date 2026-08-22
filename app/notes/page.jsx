@@ -1,4 +1,5 @@
 import { ResearchNotebookIndex } from "@/components/academic/ResearchNotebookPages";
+import { listResearchNotes } from "@/lib/researchNotesStore";
 
 export const metadata = {
   title: "AI & Education Reflections",
@@ -6,6 +7,7 @@ export const metadata = {
     "An evolving research notebook with paper notes, research questions, field experiment ideas, and general reflections.",
 };
 
-export default function NotesPage() {
-  return <ResearchNotebookIndex />;
+export default async function NotesPage() {
+  const notes = await listResearchNotes();
+  return <ResearchNotebookIndex notes={notes} />;
 }

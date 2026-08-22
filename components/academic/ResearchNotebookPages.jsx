@@ -9,6 +9,7 @@ import {
   getAllCategoryCounts,
   getPublishedNotesByCategory,
   getNoteFolder,
+  researchNotes as staticNotes,
 } from "@/lib/content/notes";
 
 function formatNoteDate(iso) {
@@ -69,8 +70,8 @@ function EmptyCategoryState() {
 }
 
 /** /notes — umbrella notebook index with four folder cards */
-export function ResearchNotebookIndex() {
-  const counts = getAllCategoryCounts();
+export function ResearchNotebookIndex({ notes = staticNotes } = {}) {
+  const counts = getAllCategoryCounts(notes);
 
   return (
     <NotebookShell>
@@ -120,9 +121,9 @@ export function ResearchNotebookIndex() {
 }
 
 /** Category filtered view under /notes/<category-id> */
-export function ResearchNotesCategoryPage({ categoryId }) {
+export function ResearchNotesCategoryPage({ categoryId, notes: allNotes = staticNotes }) {
   const folder = getNoteFolder(categoryId);
-  const notes = getPublishedNotesByCategory(categoryId);
+  const notes = getPublishedNotesByCategory(categoryId, allNotes);
 
   if (!folder) {
     return (

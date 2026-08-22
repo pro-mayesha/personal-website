@@ -24,6 +24,7 @@ import {
 import { useBlogPosts } from "@/lib/blog/useBlogPosts.js";
 import { BLOG_CATEGORIES } from "@/lib/blog/blogCategories.js";
 import { NotebookStoryCard } from "@/lib/blog/NotebookStoryCard.jsx";
+import AdminResearchNotebook from "@/components/pages/AdminResearchNotebook.jsx";
 
 const inputClass =
   "w-full rounded-sm border-2 border-[rgba(204,66,44,0.35)] bg-paperSoft px-3 py-2 font-garamond text-ink outline-none focus:border-terracotta";
@@ -61,13 +62,18 @@ export default function AdminBlogPage() {
   const [adminEmail, setAdminEmail] = useState(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const { posts, loading: postsLoading, refresh: refreshPosts } = useBlogPosts();
+  const { posts, loading: postsLoading, error: postsError, refresh: refreshPosts } = useBlogPosts();
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [authMode, setAuthMode] = useState("login");
+  const [mongoOnline, setMongoOnline] = useState(null);
 
   useEffect(() => {
     hasAdminAccount().then(setAccountReady);
+    fetch("/api/auth/status")
+      .then((res) => res.json())
+      .then((data) => setMongoOnline(Boolean(data.mongo)))
+      .catch(() => setMongoOnline(false));
     const unsub = subscribeAdminAuth((signedIn) => {
       setLogged(signedIn);
       setAuthChecked(true);
@@ -363,7 +369,7 @@ export default function AdminBlogPage() {
           <h1 className="font-hand text-4xl font-bold text-terracotta">Admin dashboard</h1>
           <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-ink/40">
             signed in as {adminEmail ?? "admin"}
-            {cloud ? " · live database" : " · local browser"} · export often
+            {mongoOnline ? " · live database" : " · local files (Atlas offline)"} · export often
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -380,9 +386,27 @@ export default function AdminBlogPage() {
         </div>
       </div>
 
+      {mongoOnline === false ? (
+        <p className="rounded-sm border border-terracotta/25 bg-[#fffaf8] px-4 py-3 font-garamond text-[14px] leading-relaxed text-ink/70">
+          MongoDB Atlas is offline (the old cluster hostname no longer exists). Publishing now saves on this
+          machine under <code className="font-mono text-[12px]">data/</code>. New notebook entries still appear
+          on the site. Restore a new Atlas URI in <code className="font-mono text-[12px]">.env</code> when you
+          want cloud storage again.
+        </p>
+      ) : null}
+
       <section className="rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 shadow-[3px_4px_0_rgba(192,68,42,0.12)]">
         <h2 className="mb-2 font-hand text-2xl font-bold text-terracotta">Account</h2>
-        <p className="mb-4 font-garamond text-[14px] text-ink/60">Change your password. Your admin ID stays the same.</p>
+        {mongoOnline === false ? (
+          <p className="font-garamond text-[14px] text-ink/60">
+            This login uses <code className="font-mono text-[12px]">ADMIN_ID</code> and{" "}
+            <code className="font-mono text-[12px]">ADMIN_PASSWORD</code> in the server environment. Change those
+            values and redeploy to update the password.
+          </p>
+        ) : (
+          <p className="mb-4 font-garamond text-[14px] text-ink/60">Change your password. Your admin ID stays the same.</p>
+        )}
+        {mongoOnline === false ? null : (
         <form onSubmit={tryChangePassword} className="grid max-w-md gap-3">
           <label className="block space-y-1">
             <span className="font-mono text-[10px] uppercase tracking-widest text-terracotta/60">current password</span>
@@ -424,12 +448,16 @@ export default function AdminBlogPage() {
           </button>
           {accountMessage ? <p className="font-garamond text-sm text-ink/70">{accountMessage}</p> : null}
         </form>
+        )}
       </section>
 
       <section className="rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 shadow-[3px_4px_0_rgba(192,68,42,0.12)]">
         <h2 className="mb-4 font-hand text-2xl font-bold text-terracotta">Published notes</h2>
         {postsLoading ? <p className="font-garamond text-sm text-ink/50">Loading notes…</p> : null}
-        {cloud && posts.length === 0 && !postsLoading ? (
+        {postsError && !/querySrv|ENOTFOUND/i.test(postsError) ? (
+          <p className="mb-3 font-garamond text-sm text-terracotta">{postsError}</p>
+        ) : null}
+        {mongoOnline && posts.length === 0 && !postsLoading ? (
           <button
             type="button"
             onClick={runSeed}
@@ -478,8 +506,10 @@ export default function AdminBlogPage() {
         </div>
       </section>
 
+      <AdminResearchNotebook />
+
       <section>
-        <h2 className="mb-2 font-hand text-3xl font-bold text-terracotta">{editingId ? "Edit note" : "New note"}</h2>
+        <h2 className="mb-2 font-hand text-3xl font-bold text-terracotta">{editingId ? "Edit note" : "New personal / blog note"}</h2>
         {error ? <p className="mb-4 font-garamond text-sm text-terracotta">{error}</p> : null}
 
         <form onSubmit={submitPost} className="space-y-6">

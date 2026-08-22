@@ -1,4 +1,5 @@
 import { ResearchNotesCategoryPage } from "@/components/academic/ResearchNotebookPages";
+import { listResearchNotes } from "@/lib/researchNotesStore";
 
 export const metadata = {
   title: "General Reflections · AI & Education Reflections",
@@ -6,6 +7,7 @@ export const metadata = {
     "Broader reflections connecting technical learning, product development, research, and observations from real users.",
 };
 
-export default function ReflectionsPage() {
-  return <ResearchNotesCategoryPage categoryId="reflections" />;
+export default async function ReflectionsPage() {
+  const notes = await listResearchNotes();
+  return <ResearchNotesCategoryPage categoryId="reflections" notes={notes} />;
 }

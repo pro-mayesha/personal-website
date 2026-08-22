@@ -9,6 +9,13 @@ function normalizeAdminId(value) {
 
 export async function POST(request) {
   try {
+    const { getEnvAdmin } = await import("@/lib/envAdmin");
+    if (getEnvAdmin()) {
+      return NextResponse.json(
+        { error: "An admin login is already set in .env (ADMIN_ID / ADMIN_PASSWORD). Use Sign in." },
+        { status: 400 }
+      );
+    }
     const db = await getDb();
     if (await db.collection("admin").findOne({})) {
       return NextResponse.json({ error: "Admin account already exists." }, { status: 400 });

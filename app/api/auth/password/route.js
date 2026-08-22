@@ -12,6 +12,12 @@ export async function POST(request) {
     if (newPassword.length < 8) {
       return NextResponse.json({ error: "New password must be at least 8 characters." }, { status: 400 });
     }
+    if (process.env.ADMIN_PASSWORD && admin.adminId === String(process.env.ADMIN_ID || "").trim().toLowerCase()) {
+      return NextResponse.json(
+        { error: "This login is set in .env (ADMIN_PASSWORD). Change it there, then restart the server." },
+        { status: 400 }
+      );
+    }
     const db = await getDb();
     const record = await db.collection("admin").findOne({ adminId: admin.adminId });
     if (!record) {

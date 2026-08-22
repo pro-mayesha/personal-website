@@ -67,7 +67,8 @@ The API creates:
 
 | Collection | Purpose |
 |------------|---------|
-| `posts` | Published notes |
+| `posts` | Published personal/blog notes |
+| `research_notes` | Research notebook entries (paper notes, questions, etc.) |
 | `admin` | One admin login (hashed password) |
 
 ## Without MongoDB

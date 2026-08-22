@@ -62,7 +62,7 @@ const BELIEF_DOODLES = [
   ),
 ];
 
-const ARCHIVE_ICONS = { BookOpen, FileText, Coffee, Camera };
+const ARCHIVE_ICONS = { BookOpen, FileText, Coffee, Camera, PenLine };
 
 
 function formatNoteDate(iso) {
@@ -784,24 +784,28 @@ function ArchiveSection() {
       <div className="grid gap-4 md:grid-cols-4">
         {archiveItems.map((item, index) => {
           const Icon = ARCHIVE_ICONS[item.icon] || BookOpen;
+          const href = item.href || "/#connect";
           return (
-            <motion.a
+            <motion.div
               key={item.title}
-              href="/#connect"
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ delay: index * 0.06 }}
-              className="relative overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 transition-transform hover:-translate-y-[2px]"
-              style={{ boxShadow: "3px 4px 0 rgba(192,68,42,0.14)" }}
             >
-              <div className="absolute inset-0 bg-lines opacity-35 pointer-events-none" />
-              <div className="relative z-[1]">
-                <Icon className="mb-5 text-terracotta" size={28} />
-                <h3 className="font-hand text-[24px] font-bold leading-none text-ink">{item.title}</h3>
-                <p className="mt-3 font-garamond text-[15px] leading-relaxed text-ink/60">{item.body}</p>
-              </div>
-            </motion.a>
+              <Link
+                href={href}
+                className="relative block h-full overflow-hidden rounded-sm border-2 border-[rgba(204,66,44,0.25)] bg-paperSoft p-5 transition-transform hover:-translate-y-[2px]"
+                style={{ boxShadow: "3px 4px 0 rgba(192,68,42,0.14)" }}
+              >
+                <div className="pointer-events-none absolute inset-0 bg-lines opacity-35" />
+                <div className="relative z-[1]">
+                  <Icon className="mb-5 text-terracotta" size={28} />
+                  <h3 className="font-hand text-[24px] font-bold leading-none text-ink">{item.title}</h3>
+                  <p className="mt-3 font-garamond text-[15px] leading-relaxed text-ink/60">{item.body}</p>
+                </div>
+              </Link>
+            </motion.div>
           );
         })}
       </div>

@@ -1,11 +1,11 @@
 const STYLES = {
   published: "border-transparent bg-terracotta text-white",
   ongoing: "border-terracotta bg-terracotta/10 text-terracotta",
-  "manuscript-revision": "border-ink/25 bg-white text-ink/70",
-  "under-review": "border-ink/25 bg-white text-ink/70",
-  "in-progress": "border-terracotta bg-white text-terracotta",
-  "research-idea": "border-dashed border-terracotta/50 bg-white text-terracotta/80",
-  "working-paper": "border-terracotta bg-white text-terracotta",
+  "manuscript-revision": "border-ink/25 bg-paperSoft text-ink/70",
+  "under-review": "border-ink/25 bg-paperSoft text-ink/70",
+  "in-progress": "border-terracotta bg-paperSoft text-terracotta",
+  "research-idea": "border-dashed border-terracotta/50 bg-paperSoft text-terracotta/80",
+  "working-paper": "border-terracotta bg-paperSoft text-terracotta",
 };
 
 const LABELS = {

@@ -1,12 +1,13 @@
-import { Caveat, EB_Garamond } from "next/font/google";
+import { EB_Garamond, Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { SiteLayout } from "@/components/SiteLayout";
 import { site } from "@/lib/content/site";
 import "./globals.css";
 
-const caveat = Caveat({
+const display = EB_Garamond({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-caveat",
+  style: ["normal", "italic"],
+  variable: "--font-display",
 });
 
 const garamond = EB_Garamond({
@@ -14,6 +15,19 @@ const garamond = EB_Garamond({
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   variable: "--font-garamond",
+});
+
+const sans = Source_Sans_3({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
+});
+
+const article = Source_Serif_4({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-article",
 });
 
 const siteName = site.siteName || "Personal website";
@@ -46,8 +60,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${caveat.variable} ${garamond.variable}`}>
-      <body className="font-garamond antialiased">
+    <html lang="en" className={`${display.variable} ${garamond.variable} ${sans.variable} ${article.variable}`}>
+      <body className="bg-paper font-garamond text-ink antialiased">
         <SiteLayout>{children}</SiteLayout>
       </body>
     </html>

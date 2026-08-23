@@ -53,11 +53,11 @@ export function WritingSection() {
     <section>
       <SectionHeader id="writing" title="Writing & Research Notes" />
       {academic.writingIntro ? (
-        <p className="mb-10 max-w-3xl text-[15px] leading-relaxed text-ink/70">{academic.writingIntro}</p>
+        <p className="mb-4 max-w-3xl font-article text-[18px] leading-relaxed text-ink/75">{academic.writingIntro}</p>
       ) : null}
 
       {/* A. Short Blogs on AI & Technology */}
-      <div className="mb-12">
+      <div className="mb-7">
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
             {shortBlogs.label}
@@ -69,9 +69,9 @@ export function WritingSection() {
         <h3 className="font-garamond text-[22px] font-semibold text-ink md:text-[24px]">
           {shortBlogs.title}
         </h3>
-        <p className="mt-2 max-w-3xl text-[14.5px] leading-relaxed text-ink/70">{shortBlogs.intro}</p>
+        <p className="mt-2 max-w-3xl font-article text-[17px] leading-relaxed text-ink/70">{shortBlogs.intro}</p>
 
-        <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {loading
             ? formatLoadingPlaceholders(PREVIEW_COUNT).map((i) => (
                 <div
@@ -85,7 +85,7 @@ export function WritingSection() {
               ))}
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
           {!loading && hasMore ? (
             <button
               type="button"

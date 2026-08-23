@@ -43,7 +43,7 @@ export function SectionNav() {
   }, [sections]);
 
   return (
-    <div className="sticky top-0 z-20 border-y-2 border-line bg-white/95 backdrop-blur-sm">
+    <div className="sticky top-0 z-20 border-y-2 border-line bg-paper/95 backdrop-blur-sm">
       <nav
         className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 py-2.5 md:px-8"
         aria-label="Page sections"

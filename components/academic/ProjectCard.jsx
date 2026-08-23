@@ -32,7 +32,7 @@ export function ProjectCard({ project }) {
   ) : null;
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border-[1.5px] border-line bg-white p-5 shadow-[0_2px_10px_rgba(55,35,30,0.05)]">
+    <article className="flex h-full flex-col rounded-2xl border-[1.5px] border-line bg-paperSoft p-5 shadow-[0_2px_10px_rgba(55,35,30,0.05)]">
       <div className="flex items-start justify-between gap-2">
         <div>
           {project.type ? (

@@ -15,7 +15,7 @@ export function ResearchNotebookPreview() {
   const counts = getAllCategoryCounts();
 
   return (
-    <DetailCard className="border-terracotta/25 bg-gradient-to-br from-white via-white to-[#fff8f5]">
+    <DetailCard className="border-line bg-paperSoft">
       <p className="max-w-2xl text-[14.5px] leading-relaxed text-ink/70">
         {researchNotebook.previewBody}
       </p>
@@ -27,7 +27,7 @@ export function ResearchNotebookPreview() {
             <li key={folder.id}>
               <Link
                 href={folder.href}
-                className="flex items-center gap-2.5 rounded-xl border border-line/80 bg-white/80 px-3 py-2.5 transition-colors hover:border-terracotta/50"
+                className="flex items-center gap-2.5 rounded-xl border border-line/80 bg-paperSoft/80 px-3 py-2.5 transition-colors hover:border-terracotta/50"
               >
                 <FolderOpen size={15} className="shrink-0 text-terracotta" aria-hidden />
                 <span className="min-w-0 flex-1 text-[13px] font-medium text-ink">{folder.title}</span>

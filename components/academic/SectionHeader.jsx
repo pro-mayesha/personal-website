@@ -2,7 +2,7 @@ export function SectionHeader({ id, title, action }) {
   const isExternal = action?.href?.startsWith("http");
 
   return (
-    <div id={id} className="mb-6 flex scroll-mt-24 items-end justify-between gap-4">
+    <div id={id} className="mb-3 flex scroll-mt-24 items-end justify-between gap-3">
       <h2 className="font-garamond text-[26px] font-semibold leading-tight text-ink md:text-[30px]">{title}</h2>
       {action ? (
         <a

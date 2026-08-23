@@ -30,7 +30,7 @@ export function ResearchCard({ item, wide = false }) {
   const hasLinks = Object.values(item.links || {}).some((href) => href && href !== "#");
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border-[1.5px] border-line bg-white p-5 shadow-[0_2px_10px_rgba(55,35,30,0.05)]">
+    <article className="flex flex-col rounded-xl border border-line bg-paperSoft p-4 shadow-[0_1px_6px_rgba(55,35,30,0.04)]">
       <StatusTag status={item.status} />
 
       <h3 className="mt-3 break-words font-garamond text-[18px] font-semibold leading-snug text-ink">
@@ -38,7 +38,7 @@ export function ResearchCard({ item, wide = false }) {
       </h3>
 
       {item.summary ? (
-        <p className={`mt-2 text-[14px] leading-relaxed text-ink/70 ${wide ? "" : "flex-1"}`}>{item.summary}</p>
+        <p className="mt-2 font-article text-[15px] leading-relaxed text-ink/70">{item.summary}</p>
       ) : null}
 
       {item.venue ? (
@@ -48,7 +48,7 @@ export function ResearchCard({ item, wide = false }) {
       <div className={`mt-3 grid gap-3 ${wide ? "sm:grid-cols-2" : ""}`}>
         {item.role ? (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">My role</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Role</p>
             <p className="mt-0.5 text-[13px] text-ink/80">{item.role}</p>
           </div>
         ) : null}

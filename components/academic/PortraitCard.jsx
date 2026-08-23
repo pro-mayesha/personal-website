@@ -48,9 +48,7 @@ export function PortraitCard({
         </figure>
       </div>
 
-      <p className="mt-5 text-center font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--ink-soft)]">
-        pinned, <span className="text-terracotta">not framed</span>
-      </p>
+      <p className="mt-4 text-center font-sans text-[11px] text-muted">Japan / Bangladesh</p>
     </div>
   );
 }

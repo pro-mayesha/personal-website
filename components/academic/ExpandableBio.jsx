@@ -15,14 +15,14 @@ export function ExpandableBio({ paragraphs = [], className = "" }) {
 
   return (
     <div className={className}>
-      <p className="text-[15.5px] leading-[1.75] text-ink/75 md:text-[16.5px]">{first}</p>
+      <p className="font-article text-[18px] leading-[1.65] text-ink/80 md:text-[19px]">{first}</p>
 
       {rest.length > 0 ? (
         <>
           {open ? (
             <div className="mt-3 space-y-3">
               {rest.map((paragraph, index) => (
-                <p key={index} className="text-[15.5px] leading-[1.75] text-ink/75 md:text-[16.5px]">
+                <p key={index} className="font-article text-[18px] leading-[1.65] text-ink/80 md:text-[19px]">
                   {paragraph}
                 </p>
               ))}

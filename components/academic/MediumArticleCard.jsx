@@ -27,7 +27,7 @@ export function MediumArticleCard({ article }) {
         </span>
       </div>
 
-      <h3 className="mt-2 font-garamond text-[17px] font-semibold leading-snug text-ink transition-colors group-hover:text-terracotta md:text-[18px]">
+      <h3 className="mt-2 font-article text-[20px] font-semibold leading-snug text-ink transition-colors group-hover:text-terracotta md:text-[22px]">
         <a
           href={article.url}
           target="_blank"
@@ -39,11 +39,11 @@ export function MediumArticleCard({ article }) {
       </h3>
 
       {article.subtitle ? (
-        <p className="mt-1 text-[13px] font-medium leading-snug text-terracotta/85">{article.subtitle}</p>
+        <p className="mt-1 font-article text-[16px] italic leading-snug text-terracotta/85">{article.subtitle}</p>
       ) : null}
 
       {article.excerpt ? (
-        <p className="mt-2 flex-1 text-[13.5px] leading-relaxed text-ink/70">{article.excerpt}</p>
+        <p className="mt-2 flex-1 font-article text-[17px] leading-relaxed text-ink/70">{article.excerpt}</p>
       ) : null}
 
       {article.tags?.length ? (

@@ -13,7 +13,7 @@ export function CompanyStrip({ company }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.title} — visit website`}
-      className="group flex flex-col gap-5 rounded-2xl border-[1.5px] border-line bg-[#fff8f5] p-5 shadow-[0_2px_10px_rgba(55,35,30,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:border-terracotta/70 hover:shadow-[0_8px_20px_rgba(55,35,30,0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta sm:flex-row sm:items-center sm:gap-6 sm:p-6"
+      className="group flex flex-col gap-4 rounded-xl border border-line bg-paperSoft p-4 shadow-[0_1px_6px_rgba(55,35,30,0.04)] transition-colors hover:border-terracotta/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracotta sm:flex-row sm:items-center sm:gap-5"
     >
       <div className="flex min-w-0 flex-1 items-start gap-4">
         <span
@@ -35,7 +35,7 @@ export function CompanyStrip({ company }) {
 
       <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">My role</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Role</p>
           <p className="mt-1 text-[13px] leading-relaxed text-ink/80">{company.myRole}</p>
         </div>
         <div>

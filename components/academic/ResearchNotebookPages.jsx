@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft, FolderOpen, FileText } from "lucide-react";
-import { AcademicNav } from "@/components/academic/AcademicNav";
 import { DetailCard } from "@/components/academic/DetailCard";
 import { CategoryTag } from "@/components/academic/CategoryTag";
 import {
@@ -21,9 +20,8 @@ function formatNoteDate(iso) {
 
 function NotebookShell({ children }) {
   return (
-    <div className="min-h-screen bg-white font-sans text-ink">
-      <AcademicNav />
-      <main className="mx-auto max-w-5xl px-5 pb-20 pt-10 md:px-8 md:pt-14">{children}</main>
+    <div className="min-h-screen bg-paper font-garamond text-ink">
+      <main className="mx-auto max-w-5xl px-5 pb-10 pt-8 md:px-8">{children}</main>
     </div>
   );
 }
@@ -48,7 +46,7 @@ function NoteCard({ note }) {
         )}
       </h3>
       {note.excerpt ? (
-        <p className="mt-1.5 flex-1 text-[13.5px] leading-relaxed text-ink/70">{note.excerpt}</p>
+        <p className="mt-1.5 flex-1 font-article text-[17px] leading-relaxed text-ink/70">{note.excerpt}</p>
       ) : null}
       {note.tags?.length ? (
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -63,7 +61,7 @@ function NoteCard({ note }) {
 
 function EmptyCategoryState() {
   return (
-    <p className="rounded-2xl border border-dashed border-terracotta/30 bg-[#fffaf8] px-5 py-10 text-center text-[15px] leading-relaxed text-ink/55">
+    <p className="rounded-2xl border border-dashed border-terracotta/30 bg-paperSoft px-5 py-10 text-center font-article text-[18px] leading-relaxed text-ink/55">
       {researchNotebook.emptyState}
     </p>
   );
@@ -91,7 +89,7 @@ export function ResearchNotebookIndex({ notes = staticNotes } = {}) {
       </h1>
       <p className="mt-4 max-w-3xl text-[16px] leading-relaxed text-ink/70">{researchNotebook.intro}</p>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {noteFolders.map((folder) => {
           const count = counts[folder.id] ?? 0;
           return (

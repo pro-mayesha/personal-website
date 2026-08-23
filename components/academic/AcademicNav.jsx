@@ -14,7 +14,7 @@ export function AcademicNav() {
   const isActive = (href) => href === pathname;
 
   return (
-    <header className="border-b-2 border-line bg-white/90 backdrop-blur-sm">
+    <header className="border-b-2 border-line bg-paper/90 backdrop-blur-sm">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4 md:px-8">
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
           {site.navItems.map((link) => (
@@ -34,7 +34,7 @@ export function AcademicNav() {
 
         <a
           href={cvHref}
-          className="inline-flex items-center gap-2 rounded-lg border border-terracotta bg-white px-3.5 py-2 text-[13px] font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white"
+          className="inline-flex items-center gap-2 rounded-lg border border-terracotta bg-paperSoft px-3.5 py-2 text-[13px] font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white"
         >
           <Download size={15} aria-hidden />
           Download CV

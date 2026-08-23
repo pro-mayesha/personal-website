@@ -95,8 +95,8 @@ export function SiteHeader() {
             <Link
               href="/"
               onClick={() => setOpen(false)}
-              className={`border-b border-line py-3 font-sans text-[11px] tracking-[0.04em] ${
-                pathname === "/" && hash !== "#contact" ? "font-semibold text-terracotta" : "text-ink/70"
+              className={`border-b border-line py-4 font-display text-[24px] ${
+                pathname === "/" && hash !== "#contact" ? "text-terracotta" : "text-ink"
               }`}
             >
               Home
@@ -106,8 +106,8 @@ export function SiteHeader() {
                 key={`m-${item.href}`}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`border-b border-line py-3 font-sans text-[12px] ${
-                  isActive(pathname, item.href, hash) ? "font-semibold text-terracotta" : "text-ink"
+                className={`border-b border-line py-4 font-display text-[24px] ${
+                  isActive(pathname, item.href, hash) ? "text-terracotta" : "text-ink"
                 }`}
               >
                 {item.label}

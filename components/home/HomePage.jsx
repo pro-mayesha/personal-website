@@ -227,6 +227,7 @@ function TravelPreview() {
 function Contact() {
   const items = [
     { label: "Professional email", href: `mailto:${links.email}`, value: links.email },
+    { label: "Academic email", href: `mailto:${links.academicEmail}`, value: links.academicEmail },
     { label: "LinkedIn", href: links.linkedin, value: "mayeshamalihaproma" },
     { label: "GitHub", href: links.github, value: "pro-mayesha" },
     { label: "Google Scholar", href: links.googleScholar, value: "Academic profile" },

@@ -4,6 +4,7 @@ import { site } from "@/lib/content/site";
 
 const footerLinks = [
   { label: links.email, href: `mailto:${links.email}` },
+  { label: links.academicEmail, href: `mailto:${links.academicEmail}` },
   { label: "LinkedIn", href: links.linkedin },
   { label: "GitHub", href: links.github },
   { label: "Google Scholar", href: links.googleScholar },

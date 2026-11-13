@@ -338,6 +338,9 @@ export default function AcademicPage() {
             <LinkButton href={emailHref} icon={Mail} className="transition-colors hover:text-terracotta">
               {links.email}
             </LinkButton>
+            <LinkButton href={`mailto:${links.academicEmail}`} icon={Mail} className="transition-colors hover:text-terracotta">
+              {links.academicEmail}
+            </LinkButton>
             <LinkButton href={links.linkedin} icon={Linkedin} className="transition-colors hover:text-terracotta">
               LinkedIn
             </LinkButton>
